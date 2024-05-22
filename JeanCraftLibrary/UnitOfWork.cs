@@ -1,4 +1,5 @@
-﻿using JeanCraftLibrary.Repositories;
+﻿using JeanCraftLibrary.Entity;
+using JeanCraftLibrary.Repositories;
 using JeanCraftLibrary.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +12,7 @@ namespace JeanCraftLibrary
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
-        public DbContext _dbContext { get; }
+        public JeanCraftContext _dbContext { get; }
 
         public IAddressRepository AddressRepository => new AddressRepository(_dbContext);
 
@@ -19,7 +20,7 @@ namespace JeanCraftLibrary
 
         public IUserRepository UserRepository => new UserRepository(_dbContext);
 
-        public UnitOfWork(DbContext dbContext)
+        public UnitOfWork(JeanCraftContext dbContext)
         {
             _dbContext = dbContext;
         }

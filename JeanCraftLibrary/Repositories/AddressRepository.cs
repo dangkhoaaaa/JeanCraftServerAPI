@@ -16,8 +16,9 @@ namespace JeanCraftLibrary.Repositories
         private readonly JeanCraftContext _context;
         private readonly IMapper _mapper;
 
-        public AddressRepository(DbContext dbContext) : base(dbContext)
+        public AddressRepository(JeanCraftContext dbContext) : base(dbContext)
         {
+            _context = dbContext;
         }
 
         public async Task<IEnumerable<Address>> GetAddressesByUserId(Guid userId)
