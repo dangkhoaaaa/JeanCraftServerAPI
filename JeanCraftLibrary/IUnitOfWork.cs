@@ -10,6 +10,7 @@ namespace JeanCraftLibrary
     public interface IUnitOfWork
     {
         public IAddressRepository AddressRepository { get; }
+        public IComponentTypeRepository ComponentTypeRepository { get; }
 
         public IProductRepository ProductRepository { get; }
 

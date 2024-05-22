@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Repositories.Interface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,31 +9,63 @@ using System.Threading.Tasks;
 
 namespace JeanCraftLibrary.Repositories
 {
-    public class ComponentTypeRepository : IComponentTypeRepository
+    public class ComponentTypeRepository : GenericRepository<ComponentType>, IComponentTypeRepository
     {
-        public Task<ComponentType> CreateComponent(ComponentType ComponentType)
+        private readonly JeanCraftContext _context;
+
+        public ComponentTypeRepository(JeanCraftContext dbContext) : base(dbContext)
         {
-            throw new NotImplementedException();
+            _context = dbContext;
         }
 
-        public Task<bool> DeleteComponent(Guid ComponentTypeId)
+        public async Task<ComponentType> CreateComponent(ComponentType componentType)
         {
-            throw new NotImplementedException();
+            if (await _context.ComponentTypes.AnyAsync(c => c.TypeId == componentType.TypeId))
+            {
+                throw new Exception("TypeId already exists in the database.");
+            }
+            _context.ComponentTypes.Add(componentType);
+            await _context.SaveChangesAsync();
+            return componentType;
         }
 
-        public Task<ComponentType> GetAllComponent()
+        public async Task<bool> DeleteComponent(Guid ComponentTypeId)
         {
-            throw new NotImplementedException();
+            var ComponentType = await _context.ComponentTypes.FindAsync(ComponentTypeId);
+            if(ComponentType == null)
+            {
+                return false;
+            }
+            _context.ComponentTypes.Remove(ComponentType);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<ComponentType> GetComponentById(Guid ComponentTypeId)
+        public async Task<IEnumerable<ComponentType>> GetAllComponent()
         {
-            throw new NotImplementedException();
+            return await _context.ComponentTypes.ToListAsync();
         }
 
-        public Task<ComponentType> UpdateComponent(ComponentType ComponentType)
+        public async Task<IEnumerable<ComponentType>> GetComponentById(Guid ComponentTypeId)
         {
-            throw new NotImplementedException();
+            return await _context.ComponentTypes.Where(c => c.TypeId == ComponentTypeId).ToArrayAsync();
         }
+
+        public async Task<ComponentType> UpdateComponent(ComponentType componentType)
+        {
+            var existingEntity = await _context.ComponentTypes.FirstOrDefaultAsync(c => c.TypeId == componentType.TypeId);
+            if (existingEntity != null)
+            {
+                _context.Entry(existingEntity).CurrentValues.SetValues(componentType);
+            }
+            else
+            {
+                _context.ComponentTypes.Update(componentType);
+            }
+            await _context.SaveChangesAsync();
+            return componentType;
+        }
+
+
     }
 }

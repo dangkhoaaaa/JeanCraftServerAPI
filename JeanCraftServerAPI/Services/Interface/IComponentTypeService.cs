@@ -1,19 +1,14 @@
 ﻿using JeanCraftLibrary.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace JeanCraftLibrary.Repositories.Interface
+namespace JeanCraftServerAPI.Services.Interface
 {
-    public interface IComponentTypeRepository : IGenericRepository<ComponentType>
+    public interface IComponentTypeService
     {
         Task<IEnumerable<ComponentType>> GetAllComponent();
 
         Task<IEnumerable<ComponentType>> GetComponentById(Guid ComponentTypeId);
         Task<ComponentType> CreateComponent(ComponentType ComponentType);
-        Task<ComponentType> UpdateComponent(ComponentType componentType);
+        Task<ComponentType> UpdateComponent(ComponentType ComponentType);
         Task<bool> DeleteComponent(Guid ComponentTypeId);
     }
 }
