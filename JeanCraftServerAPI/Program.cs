@@ -19,11 +19,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IComponentTypeService, ComponentTypeService>();
+builder.Services.AddScoped<IComponentService, ComponentService>();
 
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IComponentTypeRepository, ComponentTypeRepository>();
+builder.Services.AddScoped<IComponentRepsitory, ComponentRepsitory>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<DbContext, JeanCraftContext>();
 

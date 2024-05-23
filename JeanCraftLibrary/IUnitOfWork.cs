@@ -11,6 +11,7 @@ namespace JeanCraftLibrary
     {
         public IAddressRepository AddressRepository { get; }
         public IComponentTypeRepository ComponentTypeRepository { get; }
+        public IComponentRepsitory ComponentRepsitory { get; }
 
         public IProductRepository ProductRepository { get; }
 
