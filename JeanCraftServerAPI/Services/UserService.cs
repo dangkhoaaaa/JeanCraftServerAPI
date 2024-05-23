@@ -66,14 +66,14 @@ namespace JeanCraftServerAPI.Services
             Account account = new Account()
             {
                 RoleId = Guid.Parse(Constants.ROLE_USER),
-                UserId = user.UserId,
+                UserId = Guid.NewGuid(),
                 UserName = user.UserName,
                 Email = user.Email,
                 Password = HashPassword(user.Password),
                 Image = user.Image,
                 Status = user.Status,
             };
-            return await _unitOfWork.UserRepository.RegisterUser(fileName, user);
+            return await _unitOfWork.UserRepository.RegisterUser(fileName, account);
         }
 
         public async Task<string> ResetPassWord(ResetPassWordRequest request)

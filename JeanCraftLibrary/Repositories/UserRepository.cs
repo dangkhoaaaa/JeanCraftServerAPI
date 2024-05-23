@@ -17,8 +17,10 @@ namespace JeanCraftLibrary.Repositories
         private readonly JeanCraftContext _context;
         private readonly IMapper _mapper;
 
-        public UserRepository(DbContext dbContext) : base(dbContext)
+        public UserRepository(JeanCraftContext dbContext, IMapper mapper) : base(dbContext)
         {
+            _context = dbContext;
+            _mapper = mapper;
         }
 
         public async Task<Account?> ChangePassword(Account user, string newPassword)

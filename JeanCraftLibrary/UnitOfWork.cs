@@ -1,4 +1,5 @@
-﻿using JeanCraftLibrary.Entity;
+﻿using AutoMapper;
+using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Repositories;
 using JeanCraftLibrary.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -13,19 +14,20 @@ namespace JeanCraftLibrary
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
         public JeanCraftContext _dbContext { get; }
-
+        public IMapper _mapper { get;}
         public IAddressRepository AddressRepository => new AddressRepository(_dbContext);
 
         public IProductRepository ProductRepository => new ProductRepository(_dbContext);
 
-        public IUserRepository UserRepository => new UserRepository(_dbContext);
+        public IUserRepository UserRepository => new UserRepository(_dbContext, _mapper);
 
         public IComponentTypeRepository ComponentTypeRepository => new ComponentTypeRepository(_dbContext);
         public IComponentRepsitory ComponentRepsitory => new ComponentRepsitory(_dbContext);
 
-        public UnitOfWork(JeanCraftContext dbContext)
+        public UnitOfWork(JeanCraftContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public void Commit()

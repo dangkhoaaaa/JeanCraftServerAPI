@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary;
 using JeanCraftLibrary.Entity;
+using JeanCraftLibrary.Repositories;
 using JeanCraftLibrary.Repositories.Interface;
 using JeanCraftServerAPI.Services.Interface;
 
@@ -22,12 +23,12 @@ namespace JeanCraftServerAPI.Services
 
         public async Task<Product?> DeleteProduct(Product product)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.ProductRepository.DeleteProduct(product);
         }
 
         public async Task<Product?> GetProductByID(Guid id)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.ProductRepository.GetProductByID(id);
         }
 
         public async Task<Product[]?> GetProductByName(string name)
@@ -35,9 +36,9 @@ namespace JeanCraftServerAPI.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IList<Product>> GetProductList()
+        public async Task<Product[]> GetProductList()
         {
-            return await _unitOfWork.ProductRepository.GetAllAsync();
+            return await _unitOfWork.ProductRepository.GetProductList();
         }
 
         public async Task<Product?> UpdateProduct(Product product)
