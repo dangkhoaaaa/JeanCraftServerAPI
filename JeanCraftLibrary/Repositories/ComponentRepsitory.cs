@@ -49,12 +49,12 @@ namespace JeanCraftLibrary.Repositories
 
         public async Task<IEnumerable<Component>> GetAllComponent()
         {
-            return await _dbContext.Components.ToListAsync();
+            return await _dbContext.Components.Include(x => x.TypeNavigation).ToListAsync();
         }
 
         public async Task<Component> GetComponentById(Guid Id)
         {
-            return await _dbContext.Components.AsNoTracking().FirstOrDefaultAsync(c => c.ComponentId == Id);
+            return await _dbContext.Components.Include(x => x.TypeNavigation).AsNoTracking().FirstOrDefaultAsync(c => c.ComponentId == Id);
         }
 
         public async Task<Component> UpdateComponent(Component component)
