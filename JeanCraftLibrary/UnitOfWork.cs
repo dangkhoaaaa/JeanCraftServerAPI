@@ -24,6 +24,9 @@ namespace JeanCraftLibrary
         public IComponentTypeRepository ComponentTypeRepository => new ComponentTypeRepository(_dbContext);
         public IComponentRepsitory ComponentRepsitory => new ComponentRepsitory(_dbContext);
 
+        public IOrderDetailRepository OrderDetailRepository => new OrderDetailRepository(_dbContext);
+        public IOrderRepository OrderRepository => new OrderRepository(_dbContext);
+
         public UnitOfWork(JeanCraftContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;

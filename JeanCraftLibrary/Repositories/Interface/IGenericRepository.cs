@@ -66,6 +66,12 @@ namespace JeanCraftLibrary.Repositories.Interface
         /// <param name="saveChanges"></param>
         /// <returns></returns>
         Task DeleteRangeAsync(IEnumerable<T> entities, bool saveChanges = true);
-
+        IEnumerable<T> GetDetail(
+      Expression<Func<T, bool>> filter = null,
+      Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+      string includeProperties = "",
+      int? pageIndex = null, // Optional parameter for pagination (page number)
+      int? pageSize = null   // Optional parameter for pagination (number of records per page)
+  );
     }
 }

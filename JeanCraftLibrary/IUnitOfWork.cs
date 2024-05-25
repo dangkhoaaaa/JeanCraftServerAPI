@@ -16,6 +16,10 @@ namespace JeanCraftLibrary
         public IProductRepository ProductRepository { get; }
 
         public IUserRepository UserRepository { get; }
+
+        public IOrderRepository OrderRepository { get; }
+
+        public IOrderDetailRepository OrderDetailRepository { get; }
         void Commit();
         Task CommitAsync();
         void Rollback();

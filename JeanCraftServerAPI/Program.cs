@@ -12,6 +12,7 @@ using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using JeanCraftLibrary;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
@@ -24,6 +25,8 @@ builder.Services.AddScoped<IComponentService, ComponentService>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 builder.Services.AddScoped<IComponentTypeRepository, ComponentTypeRepository>();
 builder.Services.AddScoped<IComponentRepsitory, ComponentRepsitory>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -33,7 +36,12 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddDbContext<JeanCraftContext>(options => options.UseSqlServer(connectionString));
 // Register Mapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-
+builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        });
 //CORS
 builder.Services.AddCors(options =>
 {
