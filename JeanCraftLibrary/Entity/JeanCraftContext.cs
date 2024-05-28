@@ -39,6 +39,7 @@ public partial class JeanCraftContext : DbContext
     public virtual DbSet<Payment> Payments { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
+    public virtual DbSet<ShoppingCart> ShoppingCarts { get; set; }
 
     public virtual DbSet<ProductInventory> ProductInventories { get; set; }
 
