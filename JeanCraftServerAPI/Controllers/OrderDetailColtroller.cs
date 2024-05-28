@@ -18,46 +18,40 @@ namespace JeanCraftServerAPI.Controllers
             _orderDetailService = OrderDetailRepository;
         }
 
-        // GET: api/MentorUser
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDetail>>> GetAllMentors()
+        [HttpGet("GetAllOrderDetail")]
+        public async Task<ActionResult<IEnumerable<OrderDetail>>> GetAllOrderDetail()
         {
-            var mentors = await _orderDetailService.GetAll();
-            return Ok(mentors);
+            var orderdetail = await _orderDetailService.GetAll();
+            return Ok(orderdetail);
         }
 
-        // GET: api/MentorUser/{id}
         [HttpGet("GetMentorById/{{id}}")]
-        public async Task<ActionResult<OrderDetail>> GetMentorById(Guid id)
+        public async Task<ActionResult<OrderDetail>> GetOrderDetailById(Guid id)
         {
-            var mentor = _orderDetailService.GetDetailOne(id);
-            if (mentor == null)
+            var orderdetail = _orderDetailService.GetDetailOne(id);
+            if (orderdetail == null)
             {
                 return NotFound();
             }
-            return Ok(mentor);
+            return Ok(orderdetail);
         }
 
-
-
-
-
-        // POST: api/MentorUser
-        [HttpPost]
-        public async Task<ActionResult> AddMentor([FromBody] OrderDetail mentor)
+        
+        [HttpPost("CreateOrderDetail")]
+        public async Task<ActionResult> AddOrderDetail([FromBody] OrderDetail orderdetail)
         {
-            if (mentor == null)
+            if (orderdetail == null)
             {
                 return BadRequest();
             }
 
-            await _orderDetailService.Add(mentor);
-            return CreatedAtAction(nameof(GetMentorById), new { id = mentor.ProductId }, mentor);
+            await _orderDetailService.Add(orderdetail);
+            return CreatedAtAction(nameof(GetOrderDetailById), new { id = orderdetail.ProductId }, orderdetail);
         }
 
-        // PUT: api/MentorUser/{id}
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateMentor(Guid id, [FromBody] OrderDetail mentor)
+       
+        [HttpPut("UpdateOrderDetail/{id}")]
+        public async Task<ActionResult> UpdateOrderDetail(Guid id, [FromBody] OrderDetail orderdetail)
         {
             //if (mentor == null || id != mentor.Id)
             //{
@@ -70,16 +64,15 @@ namespace JeanCraftServerAPI.Controllers
             //    return NotFound();
             //}
 
-            await _orderDetailService.Update(mentor);
+            await _orderDetailService.Update(orderdetail);
             return NoContent();
         }
 
-        // DELETE: api/MentorUser/{id}
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteMentor(Guid id)
+        [HttpDelete("DeleteOrderDetail/{id}")]
+        public async Task<ActionResult> DeleteOrderDetail(Guid id)
         {
-            var mentor = await _orderDetailService.GetOne(id);
-            if (mentor == null)
+            var orderdetail = await _orderDetailService.GetOne(id);
+            if (orderdetail == null)
             {
                 return NotFound();
             }
