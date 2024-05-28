@@ -5,6 +5,9 @@ using System.Net;
 using JeanCraftLibrary.Repositories.Interface;
 using JeanCraftServerAPI.Services.Interface;
 using JeanCraftLibrary;
+using Microsoft.AspNetCore.Identity.Data;
+using static System.Net.WebRequestMethods;
+using JeanCraftLibrary.Repositories;
 
 namespace JeanCraftServerAPI.Services
 {
@@ -81,6 +84,7 @@ namespace JeanCraftServerAPI.Services
             return SendOTP(request.Email, Constants.MAIL, Constants.SERVER, Constants.PORT, Constants.USERNAME, Constants.PASSWORD);
         }
 
+
         public async Task<Account?> UpdateUserProfile(Account user)
         {
             return await _unitOfWork.UserRepository.UpdateUser(user);
@@ -140,5 +144,30 @@ namespace JeanCraftServerAPI.Services
 
             return otp;
         }
+
+        public async Task<RPFormResponse> ResetPasswordAsync(RPFormRequest request)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserByEmail(request.Email);
+            if (user == null)
+            {
+                return new RPFormResponse
+                {
+                    IsSuccess = false,
+                    Message = "User not found."
+                };
+            }
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            await _unitOfWork.UserRepository.UpdateUser(user);
+            await _unitOfWork.CommitAsync();
+
+            return new RPFormResponse
+            {
+                IsSuccess = true,
+                Message = "Password has been reset successfully."
+            };
+        }
+            
     }
 }
+

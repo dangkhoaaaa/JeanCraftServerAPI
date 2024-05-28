@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using JeanCraftServerAPI.Services.Interface;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace JeanCraftServerAPI.Controllers
 {
@@ -119,11 +120,12 @@ namespace JeanCraftServerAPI.Controllers
                     return Ok(ResponseHandle<LoginResponse>.Error("Password must contain at least 6 characters."));
                 }
 
-                /*if (await _userService.CheckIsExistEmail(userDto.Email, 0))
+                Account user = await _userService.GetUserByEmail(userDto.Email);
+                if (user != null)
                 {
                     return Ok(ResponseHandle<LoginResponse>.Error("Email already in exists"));
-                }*/
-                Account user = await _userService.RegisterUser("", userDto);
+                }
+                user = await _userService.RegisterUser("", userDto);
 
 
                 var token = GenerateJwtToken(user);
@@ -156,6 +158,17 @@ namespace JeanCraftServerAPI.Controllers
 
             var otp = await _userService.ResetPassWord(request);
             return Ok(ResponseHandle<string>.Success(otp));
+        }
+
+        [HttpPost("reset-password-form")]
+        public async Task<IActionResult> ResetPassword([FromBody] RPFormRequest request)
+        {
+            var response = await _userService.ResetPasswordAsync(request);
+            if (response.IsSuccess)
+            {
+                return Ok(new { Message = response.Message });
+            }
+            return BadRequest(new { Message = response.Message });
         }
 
         private string GenerateJwtToken(Account user)

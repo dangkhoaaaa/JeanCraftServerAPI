@@ -1,4 +1,5 @@
 using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using JeanCraftLibrary.Repositories;
 using JeanCraftServerAPI.Services;
@@ -13,6 +14,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using JeanCraftLibrary;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
@@ -41,7 +44,18 @@ builder.Services.AddControllers()
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        } );
+builder.Services.AddAutoMapper(typeof(AutoMapperProduct));
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+
+Host.CreateDefaultBuilder(args)
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<StartupBase>();
+            // Use environment variable for port
+            webBuilder.UseUrls($"http://*:{port}");
         });
+
 //CORS
 builder.Services.AddCors(options =>
 {
@@ -71,12 +85,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddControllers();
 var app = builder.Build();
 app.UseCors("AllowAll");
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

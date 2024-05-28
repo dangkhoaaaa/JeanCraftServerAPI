@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Response;
 using JeanCraftLibrary.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -47,9 +48,11 @@ namespace JeanCraftLibrary.Repositories
             return true;
         }
 
-        public async Task<IEnumerable<Component>> GetAllComponent()
+        public async Task<List<IGrouping<Guid?, Component>>> GetAllComponent()
         {
-            return await _dbContext.Components.Include(x => x.TypeNavigation).ToListAsync();
+            var components = await _dbContext.Components.Include(x => x.TypeNavigation).GroupBy(y => y.Type).ToListAsync();
+
+            return components;
         }
 
         public async Task<Component> GetComponentById(Guid Id)

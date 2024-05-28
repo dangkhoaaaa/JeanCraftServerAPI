@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace JeanCraftLibrary.Repositories.Interface
         Task<Product?> GetProductByID(Guid id);
         Task<Product[]?> GetProductByName(string name);
         Task<Product?> UpdateProduct(Product product);
+        Task<Product[]?> SearchProduct(SearchProductRequest filter);
     }
 }

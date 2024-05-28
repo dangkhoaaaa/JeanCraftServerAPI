@@ -5,6 +5,7 @@ using JeanCraftLibrary.Repositories;
 using JeanCraftServerAPI.Util;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace JeanCraftServerAPI.Services.Interface
 {
@@ -18,5 +19,6 @@ namespace JeanCraftServerAPI.Services.Interface
         Task<Account> CreateUserGoogle(GoogleLoginForm userDto);
         Task<Account?> UpdateUserProfile(Account user);
         Task<string> ResetPassWord(ResetPassWordRequest request);
+        Task<RPFormResponse> ResetPasswordAsync(RPFormRequest request);
     }
 }
