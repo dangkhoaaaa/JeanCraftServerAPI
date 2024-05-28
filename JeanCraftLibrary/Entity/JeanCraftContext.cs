@@ -323,6 +323,14 @@ public partial class JeanCraftContext : DbContext
                 .HasMaxLength(10)
                 .IsFixedLength();
         });
+        modelBuilder.Entity<ShoppingCart>(entity =>
+        {
+            entity.HasKey(e => new { e.CartId, e.UserId });
+
+           
+        });
+
+        
 
         OnModelCreatingPartial(modelBuilder);
     }

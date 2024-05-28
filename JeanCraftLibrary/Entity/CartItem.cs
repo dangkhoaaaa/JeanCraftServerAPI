@@ -5,7 +5,7 @@ namespace JeanCraftLibrary.Entity;
 
 public partial class CartItem
 {
-    public Guid ProductId { get; set; }
+    public Guid? ProductId { get; set; }
 
     public Guid Id { get; set; }
 

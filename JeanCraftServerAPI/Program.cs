@@ -25,6 +25,7 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IComponentTypeService, ComponentTypeService>();
 builder.Services.AddScoped<IComponentService, ComponentService>();
 builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
+builder.Services.AddScoped<ICartItemService, CartItemService>();
 
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -34,6 +35,7 @@ builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 builder.Services.AddScoped<IComponentTypeRepository, ComponentTypeRepository>();
 builder.Services.AddScoped<IComponentRepsitory, ComponentRepsitory>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<DbContext, JeanCraftContext>();
 

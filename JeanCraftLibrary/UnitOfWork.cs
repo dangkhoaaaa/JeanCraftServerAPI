@@ -28,6 +28,8 @@ namespace JeanCraftLibrary
         public IOrderDetailRepository OrderDetailRepository => new OrderDetailRepository(_dbContext);
         public IOrderRepository OrderRepository => new OrderRepository(_dbContext);
 
+        public ICartItemRepository CartItemRepository => new CartItemRepository(_dbContext);
+
         public UnitOfWork(JeanCraftContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
