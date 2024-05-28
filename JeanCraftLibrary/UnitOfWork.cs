@@ -22,6 +22,7 @@ namespace JeanCraftLibrary
         public IUserRepository UserRepository => new UserRepository(_dbContext, _mapper);
 
         public IComponentTypeRepository ComponentTypeRepository => new ComponentTypeRepository(_dbContext);
+        public IShoppingCartRepository ShoppingCartRepository => new ShoppingCartRepository(_dbContext);
         public IComponentRepsitory ComponentRepsitory => new ComponentRepsitory(_dbContext);
 
         public IOrderDetailRepository OrderDetailRepository => new OrderDetailRepository(_dbContext);

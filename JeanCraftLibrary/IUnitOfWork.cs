@@ -20,6 +20,7 @@ namespace JeanCraftLibrary
         public IOrderRepository OrderRepository { get; }
 
         public IOrderDetailRepository OrderDetailRepository { get; }
+        public IShoppingCartRepository ShoppingCartRepository { get; }
         void Commit();
         Task CommitAsync();
         void Rollback();
