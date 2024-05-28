@@ -1,85 +1,114 @@
 ﻿using JeanCraftLibrary.Entity;
-using JeanCraftLibrary.Repositories.Interface;
+using JeanCraftLibrary.Model;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
 
 namespace JeanCraftServerAPI.Controllers
 {
-
     [ApiController]
     [Route("api/OrderDetail")]
-    public class OrderDetailColtroller : ControllerBase
+    public class OrderDetailController : ControllerBase
     {
-
         private readonly IOrderDetailService _orderDetailService;
 
-        public OrderDetailColtroller(IOrderDetailService OrderDetailRepository)
+        public OrderDetailController(IOrderDetailService orderDetailService)
         {
-            _orderDetailService = OrderDetailRepository;
+            _orderDetailService = orderDetailService;
         }
 
-        [HttpGet("GetAllOrderDetail")]
-        public async Task<ActionResult<IEnumerable<OrderDetail>>> GetAllOrderDetail()
+        [HttpGet("GetAllOrderDetails")]
+        public async Task<ActionResult<IEnumerable<OrderDetailFormModel>>> GetAllOrderDetails([FromQuery] FormSearch search)
         {
-            var orderdetail = await _orderDetailService.GetAll();
-            return Ok(orderdetail);
-        }
-
-        [HttpGet("GetMentorById/{{id}}")]
-        public async Task<ActionResult<OrderDetail>> GetOrderDetailById(Guid id)
-        {
-            var orderdetail = _orderDetailService.GetDetailOne(id);
-            if (orderdetail == null)
+            var orderDetails =  _orderDetailService.GetAllPaging(search.currentPage, search.pageSize);
+            if (orderDetails == null || orderDetails.Count == 0)
             {
-                return NotFound();
+                return NotFound("No order details found.");
             }
-            return Ok(orderdetail);
+            return Ok(orderDetails);
         }
 
-        
+        [HttpGet("GetOrderDetailById/{id}")]
+        public async Task<ActionResult<OrderDetailFormModel>> GetOrderDetailById(Guid id, [FromQuery] FormSearch search)
+        {
+            var orderDetail =  _orderDetailService.GetDetailOne(id, search.currentPage, search.pageSize);
+            if (orderDetail == null)
+            {
+                return NotFound($"Order detail with ID {id} not found.");
+            }
+            return Ok(orderDetail);
+        }
+
         [HttpPost("CreateOrderDetail")]
-        public async Task<ActionResult> AddOrderDetail([FromBody] OrderDetail orderdetail)
+        public async Task<ActionResult<OrderDetailFormModel>> AddOrderDetail([FromBody] OrderDetailFormModel orderDetail)
         {
-            if (orderdetail == null)
+            if (orderDetail == null)
             {
-                return BadRequest();
+                return BadRequest("Order detail is null.");
             }
 
-            await _orderDetailService.Add(orderdetail);
-            return CreatedAtAction(nameof(GetOrderDetailById), new { id = orderdetail.ProductId }, orderdetail);
+            try
+            {
+                await _orderDetailService.Add(orderDetail);
+                return CreatedAtAction(nameof(GetOrderDetailById), new { id = orderDetail.OrderId }, orderDetail);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
-       
         [HttpPut("UpdateOrderDetail/{id}")]
-        public async Task<ActionResult> UpdateOrderDetail(Guid id, [FromBody] OrderDetail orderdetail)
+        public async Task<ActionResult<OrderDetailFormModel>> UpdateOrderDetail(Guid id, [FromBody] OrderDetailFormModel orderDetail)
         {
-            //if (mentor == null || id != mentor.Id)
-            //{
-            //    return BadRequest();
-            //}
+            if (orderDetail == null)
+            {
+                return BadRequest("Order detail is null.");
+            }
 
-            //var existingMentor = await _mentorUserService.GetOne(id);
-            //if (existingMentor == null)
-            //{
-            //    return NotFound();
-            //}
+            if (id != orderDetail.OrderId)
+            {
+                return BadRequest("ID mismatch.");
+            }
 
-            await _orderDetailService.Update(orderdetail);
-            return NoContent();
+            var existingOrderDetail = await _orderDetailService.GetOne(id);
+            if (existingOrderDetail == null)
+            {
+                return NotFound($"Order detail with ID {id} not found.");
+            }
+
+            try
+            {
+                await _orderDetailService.Update(orderDetail);
+                var updatedOrderDetail = await _orderDetailService.GetOne(id);
+                return CreatedAtAction(nameof(GetOrderDetailById), new { id = updatedOrderDetail.OrderId }, updatedOrderDetail);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpDelete("DeleteOrderDetail/{id}")]
         public async Task<ActionResult> DeleteOrderDetail(Guid id)
         {
-            var orderdetail = await _orderDetailService.GetOne(id);
-            if (orderdetail == null)
+            var orderDetail = await _orderDetailService.GetOne(id);
+            if (orderDetail == null)
             {
-                return NotFound();
+                return NotFound($"Order detail with ID {id} not found.");
             }
 
-            await _orderDetailService.Delete(id);
-            return NoContent();
+            try
+            {
+                await _orderDetailService.Delete(id);
+                return Ok($"Order detail with ID {id} was successfully deleted.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-
     }
 }

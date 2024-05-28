@@ -15,6 +15,8 @@ namespace JeanCraftLibrary.Mapper
         {
             CreateMap<Account, AccountDTO>().ReverseMap();
             CreateMap<Address, AddressDTO>().ReverseMap();
+            CreateMap<Order, OrderFormModel>().ReverseMap();
+            CreateMap<OrderDetail, OrderDetailFormModel>().ReverseMap();
         }
     }
 }

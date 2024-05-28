@@ -1,5 +1,7 @@
-﻿using JeanCraftLibrary;
+﻿using AutoMapper;
+using JeanCraftLibrary;
 using JeanCraftLibrary.Entity;
+using JeanCraftLibrary.Model;
 using JeanCraftServerAPI.Services.Interface;
 using System.Linq.Expressions;
 
@@ -9,20 +11,21 @@ namespace JeanCraftServerAPI.Services
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public OrderService(IUnitOfWork unitOfWork)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task Add(Order Order)
+        public async Task Add(OrderFormModel orderFormModel)
         {
             try
             {
-
+                var orderEntity = _mapper.Map<Order>(orderFormModel);
                 var repos = _unitOfWork.OrderRepository;
-                await repos.AddAsync(Order);
-
+                await repos.AddAsync(orderEntity);
                 await _unitOfWork.CommitAsync();
             }
             catch (Exception e)
@@ -32,18 +35,16 @@ namespace JeanCraftServerAPI.Services
             }
         }
 
-        public async Task Delete(Guid OrderId)
+        public async Task Delete(Guid orderId)
         {
             try
             {
-
                 var repos = _unitOfWork.OrderRepository;
-                var Order = await repos.GetAsync(a => a.Id == OrderId);
-                if (Order == null)
+                var orderEntity = await repos.GetAsync(a => a.Id == orderId);
+                if (orderEntity == null)
                     throw new KeyNotFoundException();
 
-                await repos.DeleteAsync(Order);
-
+                await repos.DeleteAsync(orderEntity);
                 await _unitOfWork.CommitAsync();
             }
             catch (Exception e)
@@ -53,41 +54,42 @@ namespace JeanCraftServerAPI.Services
             }
         }
 
-        public async Task<IList<Order>> GetAll()
+        public async Task<IList<OrderFormModel>> GetAll()
         {
-            return await _unitOfWork.OrderRepository.GetAllAsync();
+            var orders = await _unitOfWork.OrderRepository.GetAllAsync();
+            return _mapper.Map<IList<OrderFormModel>>(orders);
         }
 
-
-        public Order GetDetailOne(Guid id)
+        public OrderFormModel GetDetailOne(Guid id, int currentPage, int pageSize)
         {
-
-            Expression<Func<Order, bool>> filter = user => user.Id == id;
+            Expression<Func<Order, bool>> filter = order => order.Id == id;
             Func<IQueryable<Order>, IOrderedQueryable<Order>> orderBy = null;
-            var x = _unitOfWork.OrderRepository.GetDetail(filter, orderBy, "OrderDetails", null, null).FirstOrDefault();
-            return x;
+            var orderEntity = _unitOfWork.OrderRepository.GetDetail(filter, orderBy, "OrderDetails", currentPage, pageSize).FirstOrDefault();
+            return _mapper.Map<OrderFormModel>(orderEntity);
         }
-
-        public async Task<Order> GetOne(Guid OrderId)
+        public IList<OrderFormModel> GetAllPaging(int currentPage, int pageSize)
         {
-            return await _unitOfWork.OrderRepository.FindAsync(OrderId);
+          
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> orderBy = null;
+            var orderEntity = _unitOfWork.OrderRepository.GetDetail(null, orderBy, "OrderDetails", currentPage, pageSize);
+            return _mapper.Map<IList<OrderFormModel>>(orderEntity);
+        }
+        public async Task<OrderFormModel> GetOne(Guid orderId)
+        {
+            var orderEntity = await _unitOfWork.OrderRepository.FindAsync(orderId);
+            return _mapper.Map<OrderFormModel>(orderEntity);
         }
 
-
-        public async Task Update(Order Order)
+        public async Task Update(OrderFormModel orderFormModel)
         {
             try
             {
-
                 var repos = _unitOfWork.OrderRepository;
-                var a = await repos.FindAsync(Order.Id);
-                if (a == null)
+                var existingOrder = await repos.FindAsync(orderFormModel.Id);
+                if (existingOrder == null)
                     throw new KeyNotFoundException();
-                a.ShippingCost = Order.ShippingCost;
-                a.CartCost = Order.CartCost;
-                a.TotalCost = Order.TotalCost;
-                a.AddressId = Order.AddressId;
-                //a.Name = a.Name;
+
+                _mapper.Map(orderFormModel, existingOrder);
 
                 await _unitOfWork.CommitAsync();
             }

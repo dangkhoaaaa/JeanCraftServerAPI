@@ -1,70 +1,94 @@
 ﻿using JeanCraftLibrary.Entity;
+using JeanCraftLibrary.Model;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JeanCraftServerAPI.Controllers
 {
-  
     [ApiController]
     [Route("api/Order")]
     public class OrderController : ControllerBase
     {
-       
         private readonly IOrderService _orderService;
 
-        public OrderController(IOrderService OrderServicece)
+        public OrderController(IOrderService orderService)
         {
-            _orderService = OrderServicece;
+            _orderService = orderService;
         }
 
         [HttpGet("GetAllOrders")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetAllOrder()
+        public async Task<ActionResult<IEnumerable<OrderFormModel>>> GetAllOrders([FromQuery] FormSearch search)
         {
-            var mentors = await _orderService.GetAll();
-            return Ok(mentors);
+            var orders = _orderService.GetAllPaging(search.currentPage, search.pageSize);
+            if (orders == null || orders.Count == 0)
+            {
+                return NotFound("No orders found.");
+            }
+            return Ok(orders);
         }
 
         [HttpGet("GetOrderById/{id}")]
-        public async Task<ActionResult<Order>> GetOrderById(Guid id)
+        public async Task<ActionResult<OrderFormModel>> GetOrderById(Guid id, [FromQuery] FormSearch search)
         {
-            var order = _orderService.GetDetailOne(id);
+            var order = _orderService.GetDetailOne(id, search.currentPage, search.pageSize);
             if (order == null)
             {
-                return NotFound();
+                return NotFound($"Order with ID {id} not found.");
             }
             return Ok(order);
         }
 
-
         [HttpPost("AddOrder")]
-        public async Task<ActionResult> AddOrder([FromBody] Order order)
+        public async Task<ActionResult<OrderFormModel>> AddOrder([FromBody] OrderFormModel order)
         {
             if (order == null)
             {
-                return BadRequest();
+                return BadRequest("Order is null.");
             }
 
-            await _orderService.Add(order);
-            return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
+            try
+            {
+                await _orderService.Add(order);
+                return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
-        
         [HttpPut("UpdateOrder/{id}")]
-        public async Task<ActionResult> UpdateOrder(Guid id, [FromBody] Order order)
+        public async Task<ActionResult<OrderFormModel>> UpdateOrder(Guid id, [FromBody] OrderFormModel order)
         {
-            //if (mentor == null || id != mentor.Id)
-            //{
-            //    return BadRequest();
-            //}
+            if (order == null)
+            {
+                return BadRequest("Order is null.");
+            }
 
-            //var existingMentor = await _mentorUserService.GetOne(id);
-            //if (existingMentor == null)
-            //{
-            //    return NotFound();
-            //}
+            if (id != order.Id)
+            {
+                return BadRequest("ID mismatch.");
+            }
 
-            await _orderService.Update(order);
-            return NoContent();
+            var existingOrder = await _orderService.GetOne(id);
+            if (existingOrder == null)
+            {
+                return NotFound($"Order with ID {id} not found.");
+            }
+
+            try
+            {
+                await _orderService.Update(order);
+                var updatedOrder = await _orderService.GetOne(id); // Fetch the updated entity
+                return CreatedAtAction(nameof(GetOrderById), new { id = updatedOrder.Id }, updatedOrder);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpDelete("DeleteOrder/{id}")]
@@ -73,12 +97,18 @@ namespace JeanCraftServerAPI.Controllers
             var order = await _orderService.GetOne(id);
             if (order == null)
             {
-                return NotFound();
+                return NotFound($"Order with ID {id} not found.");
             }
 
-            await _orderService.Delete(id);
-            return NoContent();
+            try
+            {
+                await _orderService.Delete(id);
+                return Ok($"Order with ID {id} was successfully deleted.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-
     }
 }
