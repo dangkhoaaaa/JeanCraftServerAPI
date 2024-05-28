@@ -5,7 +5,7 @@ namespace JeanCraftServerAPI.Services.Interface
 {
     public interface IComponentService
     {
-        Task<IEnumerable<Component>> GetAllComponent();
+        Task<List<IGrouping<Guid?, Component>>> GetAllComponent();
 
         Task<Component> GetComponentById(Guid componentId);
         Task<Component> CreateComponent(ComponentDTO component);

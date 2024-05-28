@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary;
 using JeanCraftLibrary.Entity;
+using JeanCraftLibrary.Model.Request;
 using JeanCraftLibrary.Repositories;
 using JeanCraftLibrary.Repositories.Interface;
 using JeanCraftServerAPI.Services.Interface;
@@ -18,7 +19,12 @@ namespace JeanCraftServerAPI.Services
 
         public async Task<Product?> CreateProduct(Product product)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.ProductRepository.CreateProduct(product);
+        }
+
+        public async Task<Product?> CreateProductByBooking(Product product)
+        {
+            return await _unitOfWork.ProductRepository.CreateProduct(product);
         }
 
         public async Task<Product?> DeleteProduct(Product product)
@@ -36,14 +42,28 @@ namespace JeanCraftServerAPI.Services
             throw new NotImplementedException();
         }
 
-        public async Task<Product[]> GetProductList()
+        public async Task<Product[]?> GetProductList()
         {
             return await _unitOfWork.ProductRepository.GetProductList();
         }
 
+        public async Task<Product[]?> SearchProduct(SearchProductRequest filter)
+        {
+            filter.MinPrice = filter.MinPrice == null ? 0 : filter.MinPrice;
+            filter.MaxPrice = filter.MaxPrice == null ? 0 : filter.MaxPrice;
+            filter.MinSize = filter.MinSize == null ? 0 : filter.MinSize;
+            filter.MaxSize = filter.MaxSize == null ? 0 : filter.MaxSize;
+            return await _unitOfWork.ProductRepository.SearchProduct(filter);
+        }
+
         public async Task<Product?> UpdateProduct(Product product)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.ProductRepository.UpdateProduct(product);
+        }
+
+        public async Task<Product?> UpdateProductByBooking(Product product)
+        {
+            return await _unitOfWork.ProductRepository.UpdateProduct(product);
         }
     }
 }

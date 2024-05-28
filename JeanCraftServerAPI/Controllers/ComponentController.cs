@@ -1,5 +1,7 @@
-﻿using JeanCraftLibrary.Entity;
+﻿using AutoMapper;
+using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Response;
 using JeanCraftServerAPI.Services;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Http;
@@ -12,17 +14,20 @@ namespace JeanCraftServerAPI.Controllers
     public class ComponentController : ControllerBase
     {
         private readonly IComponentService _componentService;
+        private readonly IMapper _mapper;
 
-        public ComponentController(IComponentService componentService) 
+        public ComponentController(IComponentService componentService, IMapper mapper) 
         {
             _componentService = componentService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Component>>> GetAllComponent() 
+        public async Task<IActionResult> GetAllComponent() 
         {
-           var Components = await _componentService.GetAllComponent();
-            return Ok(Components);
+            var components = await _componentService.GetAllComponent();
+            var componentList = _mapper.Map<ComponentListResponse>(components);
+            return Ok(componentList);
         }
 
         [HttpGet("{id}")]

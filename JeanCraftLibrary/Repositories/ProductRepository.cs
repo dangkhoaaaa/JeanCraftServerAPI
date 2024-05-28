@@ -1,10 +1,12 @@
 ﻿using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Request;
 using JeanCraftLibrary.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +23,9 @@ namespace JeanCraftLibrary.Repositories
         }
         public async Task<Product> CreateProduct(Product product)
         {
-            throw new NotImplementedException();
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return product;
         }
 
         public async Task<Product> DeleteProduct(Product product)
@@ -107,9 +111,54 @@ namespace JeanCraftLibrary.Repositories
             return await productsWithDetails.ToArrayAsync();
         }
 
+        public async Task<Product[]?> SearchProduct(SearchProductRequest filter)
+        {
+            var productsWithDetails = _context.Products
+                .Where(p => p.Price >= filter.MinPrice && p.Price <= filter.MaxPrice && p.Size >= filter.MinSize && p.Size <= filter.MaxSize)
+                .Include(p => p.DesignOne)
+                    .ThenInclude(d => d.BackPocketNavigation)
+                .Include(p => p.DesignOne)
+                    .ThenInclude(d => d.CuffsNavigation)
+                .Include(p => p.DesignOne)
+                    .ThenInclude(d => d.FrontPocketNavigation)
+                .Include(p => p.DesignOne)
+                    .ThenInclude(d => d.LengthNavigation)
+                .Include(p => p.DesignOne)
+                    .ThenInclude(d => d.FlyNavigation)
+                .Include(p => p.DesignOne)
+                    .ThenInclude(d => d.FitNavigation)
+                .Include(p => p.DesignTwo)
+                    .ThenInclude(d => d.FabricColorNavigation)
+                .Include(p => p.DesignTwo)
+                    .ThenInclude(d => d.FinishingNavigation)
+                .Include(p => p.DesignThree)
+                    .ThenInclude(d => d.EmbroideryColorNavigation)
+                .Include(p => p.DesignThree)
+                    .ThenInclude(d => d.BranchBackPatchNavigation)
+                .Include(p => p.DesignThree)
+                    .ThenInclude(d => d.ButtonAndRivetNavigation)
+                .Include(p => p.DesignThree)
+                    .ThenInclude(d => d.EmbroideryFontNavigation)
+                .Include(p => p.DesignThree)
+                    .ThenInclude(d => d.MonoGramNavigation)
+                .Include(p => p.DesignThree)
+                    .ThenInclude(d => d.StitchingThreadColorNavigation);
+            return await productsWithDetails.ToArrayAsync();
+        }
+
         public async Task<Product> UpdateProduct(Product product)
         {
-            throw new NotImplementedException();
+            var existingEntity = await _context.Products.FirstOrDefaultAsync(c => c.ProductId == product.ProductId);
+            if (existingEntity != null)
+            {
+                _context.Entry(existingEntity).CurrentValues.SetValues(product);
+            }
+            else
+            {
+                _context.Products.Update(product);
+            }
+            await _context.SaveChangesAsync();
+            return product;
         }
     }
 }
