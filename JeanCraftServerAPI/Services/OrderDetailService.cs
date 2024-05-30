@@ -4,6 +4,7 @@ using JeanCraftLibrary;
 using JeanCraftServerAPI.Services.Interface;
 using System.Linq.Expressions;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Request;
 
 namespace JeanCraftServerAPI.Services
 {
@@ -18,7 +19,7 @@ namespace JeanCraftServerAPI.Services
             _mapper = mapper;
         }
 
-        public async Task Add(OrderDetailFormModel orderDetailFormModel)
+        public async Task Add(OrderDetailCreateRequestModel orderDetailFormModel)
         {
             try
             {
@@ -80,7 +81,7 @@ namespace JeanCraftServerAPI.Services
             return _mapper.Map<IList<OrderDetailFormModel>>(orderEntity);
         }
 
-        public async Task Update(OrderDetailFormModel orderDetailFormModel)
+        public async Task Update(OrderDetailUpdateRequestModel orderDetailFormModel)
         {
             try
             {
@@ -88,7 +89,10 @@ namespace JeanCraftServerAPI.Services
                 var existingOrderDetail = await repos.FindAsync(orderDetailFormModel.OrderId);
                 if (existingOrderDetail == null)
                     throw new KeyNotFoundException();
-
+                existingOrderDetail.OrderId = orderDetailFormModel.OrderId;
+                existingOrderDetail.ProductId = orderDetailFormModel.ProductId;
+                existingOrderDetail.PriceUnit = orderDetailFormModel.PriceUnit;
+                existingOrderDetail.Quantity = orderDetailFormModel.Quantity;
                 _mapper.Map(orderDetailFormModel, existingOrderDetail);
 
                 await _unitOfWork.CommitAsync();

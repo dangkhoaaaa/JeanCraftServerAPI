@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
+using JeanCraftLibrary.Model.Request;
 
 namespace JeanCraftServerAPI.Controllers
 {
@@ -42,7 +43,7 @@ namespace JeanCraftServerAPI.Controllers
         }
 
         [HttpPost("CreateOrderDetail")]
-        public async Task<ActionResult<OrderDetailFormModel>> AddOrderDetail([FromBody] OrderDetailFormModel orderDetail)
+        public async Task<ActionResult<OrderDetailCreateRequestModel>> AddOrderDetail([FromBody] OrderDetailCreateRequestModel orderDetail)
         {
             if (orderDetail == null)
             {
@@ -60,8 +61,8 @@ namespace JeanCraftServerAPI.Controllers
             }
         }
 
-        [HttpPut("UpdateOrderDetail/{id}")]
-        public async Task<ActionResult<OrderDetailFormModel>> UpdateOrderDetail(Guid id, [FromBody] OrderDetailFormModel orderDetail)
+        [HttpPut("UpdateOrderDetail")]
+        public async Task<ActionResult<OrderDetailUpdateRequestModel>> UpdateOrderDetail(Guid id, [FromBody] OrderDetailUpdateRequestModel orderDetail)
         {
             if (orderDetail == null)
             {
