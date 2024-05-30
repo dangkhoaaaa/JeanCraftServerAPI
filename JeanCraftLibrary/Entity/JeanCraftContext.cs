@@ -39,11 +39,12 @@ public partial class JeanCraftContext : DbContext
     public virtual DbSet<Payment> Payments { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
-    public virtual DbSet<ShoppingCart> ShoppingCarts { get; set; }
 
     public virtual DbSet<ProductInventory> ProductInventories { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<ShoppingCart> ShoppingCarts { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer(GetConnectionString());
@@ -67,7 +68,9 @@ public partial class JeanCraftContext : DbContext
                 .HasColumnName("UserID");
             entity.Property(e => e.Email).HasMaxLength(50);
             entity.Property(e => e.Image).HasMaxLength(1000);
-            entity.Property(e => e.Phonenumber).HasMaxLength(20);
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(10)
+                .IsFixedLength();
             entity.Property(e => e.UserName).HasMaxLength(50);
 
             entity.HasOne(d => d.Role).WithMany(p => p.Accounts)
@@ -102,25 +105,6 @@ public partial class JeanCraftContext : DbContext
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Carts_Products");
-
-            entity.HasMany(d => d.Users).WithMany(p => p.Carts)
-                .UsingEntity<Dictionary<string, object>>(
-                    "ShoppingCart",
-                    r => r.HasOne<Account>().WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_ShoppingCart_Accounts"),
-                    l => l.HasOne<CartItem>().WithMany()
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_ShoppingCart_CartItems"),
-                    j =>
-                    {
-                        j.HasKey("CartId", "UserId");
-                        j.ToTable("ShoppingCart");
-                        j.IndexerProperty<Guid>("CartId").HasColumnName("CartID");
-                        j.IndexerProperty<Guid>("UserId").HasColumnName("UserID");
-                    });
         });
 
         modelBuilder.Entity<Component>(entity =>
@@ -323,14 +307,26 @@ public partial class JeanCraftContext : DbContext
                 .HasMaxLength(10)
                 .IsFixedLength();
         });
+
         modelBuilder.Entity<ShoppingCart>(entity =>
         {
             entity.HasKey(e => new { e.CartId, e.UserId });
 
-           
-        });
+            entity.ToTable("ShoppingCart");
 
-        
+            entity.Property(e => e.CartId).HasColumnName("CartID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.Cart).WithMany(p => p.ShoppingCarts)
+                .HasForeignKey(d => d.CartId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ShoppingCart_CartItems");
+
+            entity.HasOne(d => d.User).WithMany(p => p.ShoppingCarts)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ShoppingCart_Accounts");
+        });
 
         OnModelCreatingPartial(modelBuilder);
     }

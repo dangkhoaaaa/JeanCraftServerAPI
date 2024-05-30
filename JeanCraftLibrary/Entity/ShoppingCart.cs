@@ -8,6 +8,8 @@ public partial class ShoppingCart
     public Guid CartId { get; set; }
 
     public Guid UserId { get; set; }
-    public CartItem CartItem { get; set; }
-    public Account Account { get; set; }
+
+    public virtual CartItem Cart { get; set; } = null!;
+
+    public virtual Account User { get; set; } = null!;
 }

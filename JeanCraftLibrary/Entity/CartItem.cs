@@ -5,7 +5,7 @@ namespace JeanCraftLibrary.Entity;
 
 public partial class CartItem
 {
-    public Guid? ProductId { get; set; }
+    public Guid ProductId { get; set; }
 
     public Guid Id { get; set; }
 
@@ -13,5 +13,5 @@ public partial class CartItem
 
     public virtual Product Product { get; set; } = null!;
 
-    public virtual ICollection<Account> Users { get; set; } = new List<Account>();
+    public virtual ICollection<ShoppingCart> ShoppingCarts { get; set; } = new List<ShoppingCart>();
 }

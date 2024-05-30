@@ -9,11 +9,11 @@ public partial class Account
 
     public string? UserName { get; set; }
 
-    public string? Phonenumber { get; set; }
-
     public string? Email { get; set; }
 
     public string? Password { get; set; }
+
+    public string? PhoneNumber { get; set; }
 
     public string? Image { get; set; }
 
@@ -27,5 +27,5 @@ public partial class Account
 
     public virtual Role? Role { get; set; }
 
-    public virtual ICollection<CartItem> Carts { get; set; } = new List<CartItem>();
+    public virtual ICollection<ShoppingCart> ShoppingCarts { get; set; } = new List<ShoppingCart>();
 }
