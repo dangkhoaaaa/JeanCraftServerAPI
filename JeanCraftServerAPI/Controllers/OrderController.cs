@@ -43,7 +43,7 @@ namespace JeanCraftServerAPI.Controllers
         }
 
         [HttpPost("AddOrder")]
-        public async Task<ActionResult<OrderFormModel>> AddOrder([FromBody] OrderCreateRequestModel order)
+        public async Task<ActionResult<OrderCreateRequestModel>> AddOrder([FromBody] OrderCreateRequestModel order)
         {
             if (order == null)
             {

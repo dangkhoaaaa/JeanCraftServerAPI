@@ -26,7 +26,7 @@ namespace JeanCraftLibrary.Model.Request
 
         public string? TotalCost { get; set; }
 
-
+       // public virtual ICollection<OrderDetailCreateRequestModel> OrderDetails { get; set; } = new List<OrderDetailCreateRequestModel>();
 
 
     }

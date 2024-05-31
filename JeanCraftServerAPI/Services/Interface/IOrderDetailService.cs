@@ -11,7 +11,7 @@ namespace JeanCraftServerAPI.Services.Interface
         Task<OrderDetailFormModel> GetOne(Guid OrderDetailId);
 
         Task Update(OrderDetailUpdateRequestModel OrderDetail);
-        Task Add(OrderDetailCreateRequestModel OrderDetail);
+        Task Add(ListOrderDetailUpdateRequestModel OrderDetail);
         Task Delete(Guid OrderDetail);
 
         OrderDetailFormModel GetDetailOne(Guid id, int currentPage, int pageSize);

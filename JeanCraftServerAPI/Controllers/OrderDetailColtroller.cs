@@ -43,7 +43,7 @@ namespace JeanCraftServerAPI.Controllers
         }
 
         [HttpPost("CreateOrderDetail")]
-        public async Task<ActionResult<OrderDetailCreateRequestModel>> AddOrderDetail([FromBody] OrderDetailCreateRequestModel orderDetail)
+        public async Task<ActionResult<ListOrderDetailUpdateRequestModel>> AddOrderDetail([FromBody] ListOrderDetailUpdateRequestModel orderDetail)
         {
             if (orderDetail == null)
             {
@@ -53,7 +53,7 @@ namespace JeanCraftServerAPI.Controllers
             try
             {
                 await _orderDetailService.Add(orderDetail);
-                return CreatedAtAction(nameof(GetOrderDetailById), new { id = orderDetail.OrderId }, orderDetail);
+                return CreatedAtAction(nameof(GetOrderDetailById), new { id = orderDetail.OrderDetails }, orderDetail);
             }
             catch (Exception ex)
             {

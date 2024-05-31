@@ -19,13 +19,16 @@ namespace JeanCraftServerAPI.Services
             _mapper = mapper;
         }
 
-        public async Task Add(OrderDetailCreateRequestModel orderDetailFormModel)
+        public async Task Add(ListOrderDetailUpdateRequestModel orderDetailFormModel)
         {
             try
             {
-                var orderDetailEntity = _mapper.Map<OrderDetail>(orderDetailFormModel);
-                var repos = _unitOfWork.OrderDetailRepository;
-                await repos.AddAsync(orderDetailEntity);
+                foreach (var x in orderDetailFormModel.OrderDetails) {
+                    var orderDetailEntity = _mapper.Map<OrderDetail>(x);
+                    var repos = _unitOfWork.OrderDetailRepository;
+                    await repos.AddAsync(orderDetailEntity);
+                   
+                }
                 await _unitOfWork.CommitAsync();
             }
             catch (Exception e)
