@@ -62,7 +62,7 @@ namespace JeanCraftServerAPI.Controllers
                     UserID = user.UserId,
                     FullName = user.UserName,
                     Email = user.Email,
-                    PhoneNumber = user.Phonenumber,
+                    PhoneNumber = user.PhoneNumber,
                     Role = user.RoleId == Guid.Parse(JeanCraftLibrary.Model.Constants.ROLE_USER) ? "User" : "Admin",
                     Token = token,
                 };
@@ -98,7 +98,7 @@ namespace JeanCraftServerAPI.Controllers
                 UserID = user.UserId,
                 FullName = user.UserName,
                 Email = user.Email,
-                PhoneNumber = user.Phonenumber,
+                PhoneNumber = user.PhoneNumber,
                 Role = user.RoleId == Guid.Parse(JeanCraftLibrary.Model.Constants.ROLE_USER) ? "User" : "Admin",
                 Token = token,
             };
@@ -134,7 +134,7 @@ namespace JeanCraftServerAPI.Controllers
                     UserID = user.UserId,
                     FullName = user.UserName,
                     Email = user.Email,
-                    PhoneNumber = user.Phonenumber,
+                    PhoneNumber = user.PhoneNumber,
                     Role = user.RoleId == Guid.Parse(JeanCraftLibrary.Model.Constants.ROLE_USER) ? "User" : "Admin",
                     Token = token,
                 };

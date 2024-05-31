@@ -78,7 +78,7 @@ namespace JeanCraftLibrary.Repositories
             if (userToUpdate != null)
             {
                 userToUpdate.UserName = user.UserName;
-                userToUpdate.Phonenumber = user.Phonenumber;
+                userToUpdate.PhoneNumber = user.PhoneNumber;
                 userToUpdate.Email = user.Email;
                 userToUpdate.Image = user.Image;
                 userToUpdate.Password = user.Password;

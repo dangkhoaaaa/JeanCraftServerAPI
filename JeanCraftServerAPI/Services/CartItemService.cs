@@ -49,10 +49,7 @@ namespace JeanCraftServerAPI.Services
             {
                 cartUpdate.Quantity = cart.Quantity.Value;
             }
-            if (cart.ProductId.HasValue)
-            {
-                cartUpdate.ProductId = cart.ProductId.Value;
-            }
+            cartUpdate.ProductId = cart.ProductId;
             await _unitOfWork.CartItemRepository.Updatecart(cartUpdate);
             return cartUpdate;
         }

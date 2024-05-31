@@ -8,7 +8,7 @@ namespace JeanCraftLibrary.Model.Request
 {
     public class CartItemRequest
     {
-        public Guid? ProductId { get; set; }
+        public Guid ProductId { get; set; }
 
 
         public int? Quantity { get; set; }

@@ -43,7 +43,7 @@ namespace JeanCraftServerAPI.Controllers
             {
                 UserId = accountDto.UserId,
                 UserName = accountDto.UserName,
-                Phonenumber = accountDto.Phonenumber,
+                PhoneNumber = accountDto.Phonenumber,
                 Email = accountDto.Email,
                 Image = accountDto.Image,
                 Addresses = accountDto.Addresses
