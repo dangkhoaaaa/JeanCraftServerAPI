@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Request;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -42,7 +43,7 @@ namespace JeanCraftServerAPI.Controllers
         }
 
         [HttpPost("AddOrder")]
-        public async Task<ActionResult<OrderFormModel>> AddOrder([FromBody] OrderFormModel order)
+        public async Task<ActionResult<OrderCreateRequestModel>> AddOrder([FromBody] OrderCreateRequestModel order)
         {
             if (order == null)
             {
@@ -52,7 +53,7 @@ namespace JeanCraftServerAPI.Controllers
             try
             {
                 await _orderService.Add(order);
-                return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
+                return CreatedAtAction(nameof(GetOrderById), new { id = order.AddressId }, order);
             }
             catch (Exception ex)
             {
@@ -60,8 +61,8 @@ namespace JeanCraftServerAPI.Controllers
             }
         }
 
-        [HttpPut("UpdateOrder/{id}")]
-        public async Task<ActionResult<OrderFormModel>> UpdateOrder(Guid id, [FromBody] OrderFormModel order)
+        [HttpPut("UpdateOrder")]
+        public async Task<ActionResult<OrderUpdateRequestModel>> UpdateOrder(Guid id, [FromBody] OrderUpdateRequestModel order)
         {
             if (order == null)
             {

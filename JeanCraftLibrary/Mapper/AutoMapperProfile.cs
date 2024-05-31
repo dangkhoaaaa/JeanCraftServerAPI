@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Request;
 
 namespace JeanCraftLibrary.Mapper
 {
@@ -17,6 +18,11 @@ namespace JeanCraftLibrary.Mapper
             CreateMap<Address, AddressDTO>().ReverseMap();
             CreateMap<Order, OrderFormModel>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailFormModel>().ReverseMap();
+            CreateMap<OrderDetail, OrderDetailCreateRequestModel>().ReverseMap();
+            CreateMap<Order, OrderUpdateRequestModel>().ReverseMap();
+            CreateMap<Order, OrderCreateRequestModel>().ReverseMap();
+            CreateMap<OrderDetail, OrderDetailUpdateRequestModel>().ReverseMap();
+            CreateMap<OrderDetail, ListOrderDetailUpdateRequestModel>().ReverseMap();
         }
     }
 }

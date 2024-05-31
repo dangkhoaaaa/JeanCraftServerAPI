@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Request;
 
 namespace JeanCraftServerAPI.Services.Interface
 {
@@ -9,8 +10,8 @@ namespace JeanCraftServerAPI.Services.Interface
         Task<IList<OrderDetailFormModel>> GetAll();
         Task<OrderDetailFormModel> GetOne(Guid OrderDetailId);
 
-        Task Update(OrderDetailFormModel OrderDetail);
-        Task Add(OrderDetailFormModel OrderDetail);
+        Task Update(OrderDetailUpdateRequestModel OrderDetail);
+        Task Add(ListOrderDetailUpdateRequestModel OrderDetail);
         Task Delete(Guid OrderDetail);
 
         OrderDetailFormModel GetDetailOne(Guid id, int currentPage, int pageSize);
