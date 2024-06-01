@@ -10,6 +10,7 @@ namespace JeanCraftServerAPI.Services.Interface
         Task<ShoppingCart> CreateShopingcart(ShoppingCart cart);
         Task<ShoppingCart> UpdateShopingcart(ShoppingCart cart);
         Task<bool> DeleteShopingcart(Guid id);
+        Task<IEnumerable<ShoppingCart>> GetCartForUser(Guid userId);
     }
 }
 

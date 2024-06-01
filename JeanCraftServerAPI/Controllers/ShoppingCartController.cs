@@ -42,5 +42,12 @@ namespace JeanCraftServerAPI.Controllers
             var updateCart = await _shoppingCart.UpdateShopingcart(cart);
             return Ok(updateCart);
         }
+
+        [HttpGet("GetCartForUser")]
+        public async Task<ActionResult> GetCartForUser([FromQuery] Guid userId)
+        {
+            var carts = await _shoppingCart.GetCartForUser(userId);
+            return Ok(carts);
+        }
     }
 }

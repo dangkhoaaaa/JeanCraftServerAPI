@@ -32,6 +32,11 @@ namespace JeanCraftServerAPI.Services
             return await _unitOfWork.ShoppingCartRepository.GetAllShopingcart();
         }
 
+        public async Task<IEnumerable<ShoppingCart>> GetCartForUser(Guid userId)
+        {
+            return await _unitOfWork.ShoppingCartRepository.GetCartForUser(userId);
+        }
+
         public async Task<ShoppingCart> GetShopingcartById(Guid id)
         {
             return await _unitOfWork.ShoppingCartRepository.GetShopingcartById(id);

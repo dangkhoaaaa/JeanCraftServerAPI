@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,6 +46,11 @@ namespace JeanCraftLibrary.Repositories
         public async Task<IEnumerable<ShoppingCart>> GetAllShopingcart()
         {
             return await _dbContext.ShoppingCarts.ToListAsync();
+        }
+
+        public async Task<IEnumerable<ShoppingCart>> GetCartForUser(Guid userId)
+        {
+            return await _dbContext.ShoppingCarts.AsNoTracking().Where(x => x.UserId == userId).Include(x => x.Cart).ThenInclude(x => x.Product).ToListAsync();
         }
 
         public async Task<ShoppingCart> GetShopingcartById(Guid id)

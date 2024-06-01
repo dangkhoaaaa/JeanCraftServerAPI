@@ -10,6 +10,7 @@ namespace JeanCraftLibrary.Model.Request
     {
         public Guid ProductId { get; set; }
 
+        public Guid UserId { get; set; }
 
         public int? Quantity { get; set; }
     }

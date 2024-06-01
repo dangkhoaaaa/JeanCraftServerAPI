@@ -1,4 +1,5 @@
-﻿using JeanCraftLibrary.Model.Request;
+﻿using JeanCraftLibrary.Entity;
+using JeanCraftLibrary.Model.Request;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,11 @@ namespace JeanCraftServerAPI.Controllers
     public class CartItemController : ControllerBase
     {
         private readonly ICartItemService _cartItemService;
-
-        public CartItemController(ICartItemService cartItemService) 
+        private readonly IShoppingCartService _shoppingCartService;
+        public CartItemController(ICartItemService cartItemService, IShoppingCartService shoppingCartService) 
         {
             _cartItemService = cartItemService;
+            _shoppingCartService = shoppingCartService;
         }
 
         [HttpGet]
@@ -34,6 +36,12 @@ namespace JeanCraftServerAPI.Controllers
         public async Task<IActionResult> CreateCart(CartItemRequest cartItemRequest)
         {
             var cart = await _cartItemService.Createcart(cartItemRequest);
+            ShoppingCart shoppingCart = new ShoppingCart()
+            {
+                CartId = cart.Id,
+                UserId = cartItemRequest.UserId,
+            };
+            var shoppingcart = await _shoppingCartService.CreateShopingcart(shoppingCart);
             return Ok(cart);
         }
 
