@@ -23,7 +23,7 @@ namespace JeanCraftLibrary.Repositories
         {
             var cartToAdd = new ShoppingCart
             {
-                CartId = Guid.NewGuid(),
+                CartId = cart.CartId,
                 UserId = cart.UserId
             };
             _dbContext.ShoppingCarts.Add(cartToAdd);
