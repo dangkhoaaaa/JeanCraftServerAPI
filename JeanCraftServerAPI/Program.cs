@@ -20,7 +20,6 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IComponentTypeService, ComponentTypeService>();
 builder.Services.AddScoped<IComponentService, ComponentService>();
@@ -29,6 +28,14 @@ builder.Services.AddScoped<ICartItemService, CartItemService>();
 
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IDesignOneService, DesignOneService>();
+builder.Services.AddScoped<IDesignTwoService, DesignTwoService>();
+builder.Services.AddScoped<IDesignThreeService, DesignThreeService>();
+
+
+// Add repositories to the container
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
@@ -36,7 +43,12 @@ builder.Services.AddScoped<IComponentTypeRepository, ComponentTypeRepository>();
 builder.Services.AddScoped<IComponentRepsitory, ComponentRepsitory>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+builder.Services.AddScoped<IDesignOneRepository, DesignOneRepository>();
+builder.Services.AddScoped<IDesignTwoRepository, DesignTwoRepository>();
+builder.Services.AddScoped<IDesignThreeRepository, DesignThreeRepository>();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 builder.Services.AddScoped<DbContext, JeanCraftContext>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

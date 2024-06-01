@@ -72,6 +72,7 @@ namespace JeanCraftServerAPI.Services
                 UserId = Guid.NewGuid(),
                 UserName = user.UserName,
                 Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
                 Password = HashPassword(user.Password),
                 Image = user.Image,
                 Status = user.Status,

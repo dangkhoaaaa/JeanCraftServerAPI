@@ -18,6 +18,9 @@ namespace JeanCraftLibrary
 
         public IUserRepository UserRepository { get; }
 
+        public IDesignOneRepository DesignOneRepository { get; }
+        public IDesignTwoRepository DesignTwoRepository { get; }
+        public IDesignThreeRepository DesignThreeRepository { get; }
         public IOrderRepository OrderRepository { get; }
 
         public IOrderDetailRepository OrderDetailRepository { get; }
