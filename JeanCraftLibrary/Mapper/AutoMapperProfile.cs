@@ -23,6 +23,8 @@ namespace JeanCraftLibrary.Mapper
             CreateMap<Order, OrderCreateRequestModel>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailUpdateRequestModel>().ReverseMap();
             CreateMap<OrderDetail, ListOrderDetailUpdateRequestModel>().ReverseMap();
+            CreateMap<ProductInventory, ProductInventoryRequest>().ReverseMap();
+
         }
     }
 }

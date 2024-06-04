@@ -18,6 +18,7 @@ namespace JeanCraftLibrary
         public IAddressRepository AddressRepository => new AddressRepository(_dbContext);
 
         public IProductRepository ProductRepository => new ProductRepository(_dbContext);
+        public IProductInventoryRepository ProductInventoryRepository => new ProductInventoryRepository(_dbContext);
 
         public IUserRepository UserRepository => new UserRepository(_dbContext, _mapper);
 

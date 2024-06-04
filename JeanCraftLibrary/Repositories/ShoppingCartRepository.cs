@@ -21,14 +21,14 @@ namespace JeanCraftLibrary.Repositories
 
         public async Task<ShoppingCart> CreateShopingcart(ShoppingCart cart)
         {
-            var cartToAdd = new ShoppingCart
-            {
-                CartId = cart.CartId,
-                UserId = cart.UserId
-            };
-            _dbContext.ShoppingCarts.Add(cartToAdd);
+            //var cartToAdd = new ShoppingCart
+            //{
+            //    CartId = cart.CartId,
+            //    UserId = cart.UserId
+            //};
+            _dbContext.ShoppingCarts.Add(cart);
             await _dbContext.SaveChangesAsync();
-            return cartToAdd;
+            return cart;
         }
 
         public async Task<bool> DeleteShopingcart(Guid id)
