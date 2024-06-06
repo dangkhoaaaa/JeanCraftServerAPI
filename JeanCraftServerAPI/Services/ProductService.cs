@@ -18,8 +18,12 @@ namespace JeanCraftServerAPI.Services
 
 
         public async Task<Product?> CreateProduct(Product product)
-        {
-            return await _unitOfWork.ProductRepository.CreateProduct(product);
+        {   
+            Product product1 = await _unitOfWork.ProductRepository.CreateProduct(product);
+            if (product1 != null) {
+                ProductInventory productInventory = await _unitOfWork.ProductInventoryRepository.CreateProductInventory(product.ProductInventory);
+            }
+            return product1;
         }
 
         public async Task<Product?> CreateProductByBooking(Product product)
@@ -29,7 +33,11 @@ namespace JeanCraftServerAPI.Services
 
         public async Task<Product?> DeleteProduct(Product product)
         {
-            return await _unitOfWork.ProductRepository.DeleteProduct(product);
+            if(await _unitOfWork.ProductInventoryRepository.DeleteProductInventory(product.ProductId)) { 
+                Product product1 = await _unitOfWork.ProductRepository.DeleteProduct(product);
+                return await _unitOfWork.ProductRepository.DeleteProduct(product1);
+            }
+            return null;
         }
 
         public async Task<Product?> GetProductByID(Guid id)

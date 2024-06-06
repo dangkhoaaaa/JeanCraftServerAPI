@@ -66,7 +66,8 @@ namespace JeanCraftLibrary.Repositories
                 .Include(p => p.DesignThree)
                     .ThenInclude(d => d.MonoGramNavigation)
                 .Include(p => p.DesignThree)
-                    .ThenInclude(d => d.StitchingThreadColorNavigation);
+                    .ThenInclude(d => d.StitchingThreadColorNavigation)
+                .Include(p => p.ProductInventory); ;
 
             return await productsWithDetails.FirstOrDefaultAsync();
         }
@@ -111,7 +112,8 @@ namespace JeanCraftLibrary.Repositories
                 .Include(p => p.DesignThree)
                     .ThenInclude(d => d.MonoGramNavigation)
                 .Include(p => p.DesignThree)
-                    .ThenInclude(d => d.StitchingThreadColorNavigation);
+                    .ThenInclude(d => d.StitchingThreadColorNavigation)
+                .Include(p => p.ProductInventory);
 
             return await productsWithDetails.ToArrayAsync();
         }
@@ -147,7 +149,8 @@ namespace JeanCraftLibrary.Repositories
                 .Include(p => p.DesignThree)
                     .ThenInclude(d => d.MonoGramNavigation)
                 .Include(p => p.DesignThree)
-                    .ThenInclude(d => d.StitchingThreadColorNavigation);
+                    .ThenInclude(d => d.StitchingThreadColorNavigation)
+                .Include(p => p.ProductInventory); ;
             return await productsWithDetails.ToArrayAsync();
         }
 
