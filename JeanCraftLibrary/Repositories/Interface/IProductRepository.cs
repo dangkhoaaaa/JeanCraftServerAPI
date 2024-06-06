@@ -18,5 +18,6 @@ namespace JeanCraftLibrary.Repositories.Interface
         Task<Product[]?> GetProductByName(string name);
         Task<Product?> UpdateProduct(Product product);
         Task<Product[]?> SearchProduct(SearchProductRequest filter);
+        Task<Product?> GetProductID(GetProductIDByDesignRequest request);
     }
 }

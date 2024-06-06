@@ -76,6 +76,11 @@ namespace JeanCraftLibrary.Repositories
             throw new NotImplementedException();
         }
 
+        public async Task<Product?> GetProductID(GetProductIDByDesignRequest request)
+        {
+            return await _context.Products.Where(x => x.DesignOneId == request.DesignOne && x.DesignTwoId == request.DesignTwo && x.DesignThreeId == request.DesignThree).SingleOrDefaultAsync();
+        }
+
         public async Task<Product[]?> GetProductList()
         {
             var productsWithDetails = _context.Products

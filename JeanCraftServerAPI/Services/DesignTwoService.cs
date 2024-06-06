@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary;
 using JeanCraftLibrary.Entity;
+using JeanCraftLibrary.Model.Request;
 using JeanCraftServerAPI.Services.Interface;
 
 namespace JeanCraftServerAPI.Services
@@ -12,7 +13,7 @@ namespace JeanCraftServerAPI.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<DesignTwo> CreateDesignTwo(DesignTwo designTwo)
+        public async Task<DesignTwo> CreateDesignTwo(DesignTwoRequest designTwo)
         {
             return await _unitOfWork.DesignTwoRepository.CreateDesignTwo(designTwo);
         }
@@ -25,6 +26,10 @@ namespace JeanCraftServerAPI.Services
         public async Task<DesignTwo> GetDesignTwoById(Guid designTwoId)
         {
             return await _unitOfWork.DesignTwoRepository.GetDesignTwoById(designTwoId);
+        }
+        public async Task<Guid?> FindDesignTwoByComponentsAsync(Guid? finishing, Guid? fabricColor)
+        {
+            return await _unitOfWork.DesignTwoRepository.FindDesignTwoByComponentsAsync(finishing, fabricColor);
         }
     }
 }

@@ -28,6 +28,19 @@ namespace JeanCraftLibrary.Repositories
                 .Include(d => d.BackPocketNavigation).ThenInclude(c => c.TypeNavigation).Include(d => d.CuffsNavigation).ThenInclude(c => c.TypeNavigation)
                 .Include(d => d.FlyNavigation).ThenInclude(c => c.TypeNavigation).Include(d => d.LengthNavigation).ThenInclude(c => c.TypeNavigation).ToListAsync();
         }
+        public async Task<Guid?> FindDesignOneByComponentsAsync(Guid? fit, Guid? length, Guid? cuffs, Guid? fly, Guid? frontPocket, Guid? backPocket)
+        {
+            var designOne = await _dbContext.DesignOnes
+                .Where(d => d.Fit == fit &&
+                            d.Length == length &&
+                            d.Cuffs == cuffs &&
+                            d.Fly == fly &&
+                            d.FrontPocket == frontPocket &&
+                            d.BackPocket == backPocket)
+                .FirstOrDefaultAsync();
+
+            return designOne?.DesignOneId;
+        }
 
         public async Task<DesignOne> GetDesignOneById(Guid designOneId)
         {

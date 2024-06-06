@@ -102,5 +102,16 @@ namespace JeanCraftServerAPI.Controllers
             }
             return Ok(ResponseArrayHandle<Product>.Success(products));
         }
+
+        [HttpGet("product/getProductID")]
+        public async Task<IActionResult> GetProductID([FromQuery]  GetProductIDByDesignRequest request)
+        {
+            var product = await _productService.GetProductID(request);
+            if (product == null)
+            {
+                return Ok(ResponseHandle<Product>.Error("Do not have products which you choose."));
+            }
+            return Ok(ResponseHandle<Product>.Success(product));
+        }
     }
 }

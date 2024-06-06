@@ -42,6 +42,11 @@ namespace JeanCraftServerAPI.Services
             throw new NotImplementedException();
         }
 
+        public async Task<Product?> GetProductID(GetProductIDByDesignRequest request)
+        {
+            return await _unitOfWork.ProductRepository.GetProductID(request);
+        }
+
         public async Task<Product[]?> GetProductList()
         {
             return await _unitOfWork.ProductRepository.GetProductList();
