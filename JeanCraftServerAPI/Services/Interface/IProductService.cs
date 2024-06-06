@@ -15,5 +15,6 @@ namespace JeanCraftServerAPI.Services.Interface
         Task<Product?> UpdateProductByBooking(Product product);
 
         Task<Product[]?> SearchProduct(SearchProductRequest filter);
+        Task<Product?> GetProductID(GetProductIDByDesignRequest request);
     }
 }

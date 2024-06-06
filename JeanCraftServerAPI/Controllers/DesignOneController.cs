@@ -21,14 +21,14 @@ namespace JeanCraftServerAPI.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("designone/getDesignOneList")]
+        [HttpGet("getDesignOneList")]
         public async Task<IActionResult> GetAllDesignOnes()
         {
             var designOnes = await _designOneService.GetAllDesignOnes();
             return Ok(designOnes);
         }
 
-        [HttpGet("designone/getDesignOneById/{id}")]
+        [HttpGet("getDesignOneById/{id}")]
         public async Task<IActionResult> GetDesignOneById(Guid id)
         {
             var designOne = await _designOneService.GetDesignOneById(id);
@@ -39,7 +39,18 @@ namespace JeanCraftServerAPI.Controllers
             return Ok(designOne);
         }
 
-        [HttpPost("designone/createDesignOne")]
+        [HttpGet("findDesignOneByComponents")]
+        public async Task<IActionResult> FindDesignOneByComponents([FromQuery] Guid? fit, [FromQuery] Guid? length, [FromQuery] Guid? cuffs, [FromQuery] Guid? fly, [FromQuery] Guid? frontPocket, [FromQuery] Guid? backPocket)
+        {
+            var designOneId = await _designOneService.FindDesignOneByComponentsAsync(fit, length, cuffs, fly, frontPocket, backPocket);
+            if (designOneId == null)
+            {
+                return NotFound();
+            }
+            return Ok(designOneId);
+        }
+
+        [HttpPost("createDesignOne")]
         public async Task<IActionResult> CreateDesignOne([FromBody] DesignOneRequest request)
         {
             if (request == null)

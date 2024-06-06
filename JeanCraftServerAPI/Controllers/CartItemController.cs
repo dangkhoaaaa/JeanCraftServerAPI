@@ -64,6 +64,11 @@ namespace JeanCraftServerAPI.Controllers
             {
                 return BadRequest();
             }
+            result = await _shoppingCartService.DeleteShopingcart(id);
+            if (!result)
+            {
+                return BadRequest();
+            }
             return Ok(result);
         }
     }

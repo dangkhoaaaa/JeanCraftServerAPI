@@ -28,5 +28,9 @@ namespace JeanCraftServerAPI.Services
         {
             return await _unitOfWork.DesignOneRepository.CreateAsync(designOne);
         }
+        public async Task<Guid?> FindDesignOneByComponentsAsync(Guid? fit, Guid? length, Guid? cuffs, Guid? fly, Guid? frontPocket, Guid? backPocket)
+        {
+            return await _unitOfWork.DesignOneRepository.FindDesignOneByComponentsAsync(fit, length, cuffs, fly, frontPocket, backPocket);
+        }
     }
 }
