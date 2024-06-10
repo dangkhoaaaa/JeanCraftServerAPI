@@ -34,6 +34,9 @@ namespace JeanCraftLibrary
 
         public ICartItemRepository CartItemRepository => new CartItemRepository(_dbContext);
 
+        public IPaymentRepository PaymentRepository => new PaymentRepository(_dbContext);
+
+
         public UnitOfWork(JeanCraftContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;

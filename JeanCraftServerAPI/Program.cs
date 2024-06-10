@@ -32,7 +32,7 @@ builder.Services.AddScoped<IProductInventoryService, ProductInventoryService>();
 builder.Services.AddScoped<IDesignOneService, DesignOneService>();
 builder.Services.AddScoped<IDesignTwoService, DesignTwoService>();
 builder.Services.AddScoped<IDesignThreeService, DesignThreeService>();
-
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // Add repositories to the container
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -48,7 +48,7 @@ builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IDesignOneRepository, DesignOneRepository>();
 builder.Services.AddScoped<IDesignTwoRepository, DesignTwoRepository>();
 builder.Services.AddScoped<IDesignThreeRepository, DesignThreeRepository>();
-
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<DbContext, JeanCraftContext>();
