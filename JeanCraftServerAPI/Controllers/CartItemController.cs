@@ -2,6 +2,7 @@
 using JeanCraftLibrary.Model.Request;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JeanCraftServerAPI.Controllers
@@ -59,12 +60,13 @@ namespace JeanCraftServerAPI.Controllers
         [HttpDelete("delete")]
         public async Task<IActionResult> DeleteCart(Guid id)
         {
-            var result = await _cartItemService.Deletecart(id);
+            var result = await _shoppingCartService.DeleteShopingcart(id);
+            
             if(!result)
             {
                 return BadRequest();
             }
-            result = await _shoppingCartService.DeleteShopingcart(id);
+            result = await _cartItemService.Deletecart(id);
             if (!result)
             {
                 return BadRequest();

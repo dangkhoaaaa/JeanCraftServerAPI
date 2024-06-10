@@ -7,6 +7,7 @@ using AutoMapper;
 using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
 using JeanCraftLibrary.Model.Request;
+using JeanCraftLibrary.Model.Response;
 
 namespace JeanCraftLibrary.Mapper
 {
@@ -24,10 +25,8 @@ namespace JeanCraftLibrary.Mapper
             CreateMap<OrderDetail, OrderDetailUpdateRequestModel>().ReverseMap();
             CreateMap<OrderDetail, ListOrderDetailUpdateRequestModel>().ReverseMap();
             CreateMap<ProductInventory, ProductInventoryRequest>().ReverseMap();
-            CreateMap<Payment, PaymentUpdateRequestModel>().ReverseMap();
-            CreateMap<Payment, PaymentCreateRequestModel>().ReverseMap();
-            CreateMap<Payment, PaymentModel>().ReverseMap();
-
+            CreateMap<CartItemResponse, CartItem>().ReverseMap();
+            CreateMap<ShoppingCartItemResponse, ShoppingCart>().ReverseMap();
         }
     }
 }

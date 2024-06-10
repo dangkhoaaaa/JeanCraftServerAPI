@@ -1,4 +1,6 @@
-﻿using JeanCraftLibrary.Entity;
+﻿using AutoMapper;
+using JeanCraftLibrary.Entity;
+using JeanCraftLibrary.Model.Response;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,11 @@ namespace JeanCraftServerAPI.Controllers
     public class ShoppingCartController : ControllerBase
     {
         private readonly IShoppingCartService _shoppingCart;
-
-        public ShoppingCartController(IShoppingCartService shoppingCart) 
+        private readonly IMapper _mapper;
+        public ShoppingCartController(IShoppingCartService shoppingCart, IMapper mapper) 
         {
             _shoppingCart = shoppingCart;
+            _mapper = mapper;
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ShoppingCart>>> GetAllCart()
@@ -47,7 +50,12 @@ namespace JeanCraftServerAPI.Controllers
         public async Task<ActionResult> GetCartForUser([FromQuery] Guid userId)
         {
             var carts = await _shoppingCart.GetCartForUser(userId);
-            return Ok(carts);
+            IEnumerable<ShoppingCartItemResponse> response = _mapper.Map<IEnumerable<ShoppingCartItemResponse>>(carts);
+            foreach (var item in response)
+            {
+                item.Cart.Size = item.Cart.Product.Size;
+            }
+            return Ok(response);
         }
     }
 }

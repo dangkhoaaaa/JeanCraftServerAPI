@@ -33,7 +33,7 @@ namespace JeanCraftLibrary.Repositories
 
         public async Task<bool> DeleteShopingcart(Guid id)
         {
-            var cart = await _dbContext.ShoppingCarts.FindAsync(id);
+            var cart = await _dbContext.ShoppingCarts.AsNoTracking().FirstOrDefaultAsync(c => c.CartId == id);
             if (cart != null)
             {
                 _dbContext.ShoppingCarts.Remove(cart);
