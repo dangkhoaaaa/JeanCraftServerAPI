@@ -9,6 +9,8 @@ using Microsoft.VisualBasic;
 using System;
 using System.Data.Common;
 using System.Drawing;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace JeanCraftLibrary.Repositories
 {
@@ -74,14 +76,36 @@ namespace JeanCraftLibrary.Repositories
 
         public async Task<Account?> UpdateUser(Account user)
         {
-            var userToUpdate = await _context.Accounts.FirstOrDefaultAsync(u => u.UserId == user.UserId);
+            var userToUpdate = await _context.Accounts
+                .Include(u => u.Addresses)
+                .FirstOrDefaultAsync(u => u.UserId == user.UserId);
+
             if (userToUpdate != null)
             {
-                userToUpdate.UserName = user.UserName;
-                userToUpdate.PhoneNumber = user.PhoneNumber;
-                userToUpdate.Email = user.Email;
-                userToUpdate.Image = user.Image;
-                userToUpdate.Password = user.Password;
+                if (!string.IsNullOrEmpty(user.UserName))
+                {
+                    userToUpdate.UserName = user.UserName;
+                }
+
+                if (!string.IsNullOrEmpty(user.PhoneNumber))
+                {
+                    userToUpdate.PhoneNumber = user.PhoneNumber;
+                }
+
+                if (!string.IsNullOrEmpty(user.Email))
+                {
+                    userToUpdate.Email = user.Email;
+                }
+
+                if (!string.IsNullOrEmpty(user.Image))
+                {
+                    userToUpdate.Image = user.Image;
+                }
+
+                if (!string.IsNullOrEmpty(user.Password))
+                {
+                    userToUpdate.Password = user.Password;
+                }
 
                 _context.Accounts.Update(userToUpdate);
                 await _context.SaveChangesAsync();
@@ -93,6 +117,34 @@ namespace JeanCraftLibrary.Repositories
         public async Task<Account?> GetUserByID(Guid userID)
         {
             return await _context.Accounts.FirstOrDefaultAsync(u => u.UserId == userID);
+        }
+
+        public async Task<(IEnumerable<Account>, int)> GetAccountsAsync(string? search, int currentPage, int pageSize)
+        {
+            var query = _context.Set<Account>().Include(a => a.Addresses).AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(a => a.UserName.Contains(search));
+            }
+
+            var totalCount = await query.CountAsync();
+            var accounts = await query.Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return (accounts, totalCount);
+        }
+
+        public async Task<int> GetTotalAccountsCountAsync()
+        {
+            return await _context.Set<Account>().CountAsync();
+        }
+
+        public async Task<int> GetAccountCountByDateAsync(DateTime date)
+        {
+            var accountCount = await _context.Set<Account>()
+                    .Where(o => o.InsDate.Date == date.Date)
+                    .CountAsync();
+            return accountCount;
         }
     }
 }

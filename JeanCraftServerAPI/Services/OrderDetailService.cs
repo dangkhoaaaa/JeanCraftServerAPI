@@ -106,5 +106,9 @@ namespace JeanCraftServerAPI.Services
                 throw;
             }
         }
+        public async Task<List<OrderDetail>> GetOrderDetailByOrderID(Guid orderID)
+        {
+            return await _unitOfWork.OrderRepository.GetOrderDetailByOrderID(orderID);
+        }
     }
 }

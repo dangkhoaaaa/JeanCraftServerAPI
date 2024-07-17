@@ -2,6 +2,7 @@
 using JeanCraftLibrary;
 using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Request;
 using JeanCraftLibrary.Repositories.Interface;
 using JeanCraftServerAPI.Services.Interface;
 
@@ -31,9 +32,9 @@ namespace JeanCraftServerAPI.Services
             return null;
         }
 
-        public async Task<Address> CreateAddress(Address addressdto)
+        public async Task<Address> CreateAddress(AddressRequest addressRequest)
         {
-            if (addressdto.UserId == null || addressdto.UserId == Guid.Empty)
+            if (addressRequest.UserId == null || addressRequest.UserId == Guid.Empty)
             {
                 throw new ArgumentException("UserId is required and cannot be empty.");
             }
@@ -41,13 +42,14 @@ namespace JeanCraftServerAPI.Services
             var newAddress = new Address
             {
                 Id = Guid.NewGuid(),
-                UserId = addressdto.UserId,
-                Type = addressdto.Type,
-                Detail = addressdto.Detail
+                UserId = addressRequest.UserId.Value, 
+                Type = addressRequest.Type,
+                Detail = addressRequest.Detail
             };
 
             return await _unitOfWork.AddressRepository.CreateAddress(newAddress);
         }
+
 
         public async Task<AddressDTO> UpdateAddress(Guid id, AddressDTO addressdto)
         {

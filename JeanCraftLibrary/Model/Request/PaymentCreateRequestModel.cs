@@ -9,7 +9,7 @@ namespace JeanCraftLibrary.Model.Request
 {
     public class PaymentCreateRequestModel
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
         public Guid? OrderId { get; set; }
 

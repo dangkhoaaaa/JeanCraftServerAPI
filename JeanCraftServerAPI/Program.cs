@@ -33,7 +33,8 @@ builder.Services.AddScoped<IDesignOneService, DesignOneService>();
 builder.Services.AddScoped<IDesignTwoService, DesignTwoService>();
 builder.Services.AddScoped<IDesignThreeService, DesignThreeService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-
+builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
 // Add repositories to the container
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();

@@ -16,9 +16,9 @@ namespace JeanCraftServerAPI.Controllers
             _componentTypeService = componentTypeService;
         }
         [HttpGet("GetAll")]
-        public async Task<ActionResult<IEnumerable<ComponentType>>> GetAllComponentType()
+        public async Task<ActionResult<IEnumerable<ComponentType>>> GetAllComponentType(string? search, int currentPage, int pageSize)
         {
-            var ComponentTypes = await _componentTypeService.GetAllComponent();
+            var ComponentTypes = await _componentTypeService.GetAllComponent(search, currentPage, pageSize);
             return Ok(ComponentTypes);
         }
 

@@ -23,7 +23,7 @@ namespace JeanCraftServerAPI.Controllers
         [HttpGet("GetAllOrderDetails")]
         public async Task<ActionResult<IEnumerable<OrderDetailFormModel>>> GetAllOrderDetails([FromQuery] FormSearch search)
         {
-            var orderDetails =  _orderDetailService.GetAllPaging(search.currentPage, search.pageSize);
+            var orderDetails = _orderDetailService.GetAllPaging(search.currentPage, search.pageSize);
             if (orderDetails == null || orderDetails.Count == 0)
             {
                 return NotFound("No order details found.");
@@ -34,7 +34,7 @@ namespace JeanCraftServerAPI.Controllers
         [HttpGet("GetOrderDetailById/{id}")]
         public async Task<ActionResult<OrderDetailFormModel>> GetOrderDetailById(Guid id, [FromQuery] FormSearch search)
         {
-            var orderDetail =  _orderDetailService.GetDetailOne(id, search.currentPage, search.pageSize);
+            var orderDetail = _orderDetailService.GetDetailOne(id, search.currentPage, search.pageSize);
             if (orderDetail == null)
             {
                 return NotFound($"Order detail with ID {id} not found.");
@@ -110,6 +110,13 @@ namespace JeanCraftServerAPI.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+
+        [HttpPost("GetOrderDetailByOrderID")]
+        public async Task<ActionResult> GetOrderDetailByOrderID(Guid orderId)
+        {
+            var orderDetailList = await _orderDetailService.GetOrderDetailByOrderID(orderId);
+            return Ok(ResponseArrayHandle<OrderDetail>.Success(orderDetailList.ToArray()));
         }
     }
 }

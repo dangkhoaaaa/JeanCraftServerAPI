@@ -23,9 +23,9 @@ namespace JeanCraftServerAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllComponent() 
+        public async Task<IActionResult> GetAllComponent(string? search, int currentPage, int pageSize) 
         {
-            var components = await _componentService.GetAllComponent();
+            var components = await _componentService.GetAllComponent(search, currentPage, pageSize);
             var componentList = _mapper.Map<ComponentListResponse>(components);
             return Ok(componentList);
         }

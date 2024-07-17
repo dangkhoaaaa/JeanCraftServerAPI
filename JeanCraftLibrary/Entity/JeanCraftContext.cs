@@ -68,6 +68,7 @@ public partial class JeanCraftContext : DbContext
                 .HasColumnName("UserID");
             entity.Property(e => e.Email).HasMaxLength(50);
             entity.Property(e => e.Image).HasMaxLength(1000);
+            entity.Property(e => e.InsDate).HasColumnType("datetime");
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(10)
                 .IsFixedLength();

@@ -20,5 +20,9 @@ namespace JeanCraftServerAPI.Services.Interface
         Task<Account?> UpdateUserProfile(Account user);
         Task<string> ResetPassWord(ResetPassWordRequest request);
         Task<RPFormResponse> ResetPasswordAsync(RPFormRequest request);
+        Task<(IEnumerable<Account>, int)> GetAccountsAsync(string? search, int currentPage, int pageSize);
+        Task<int> GetTotalAccountsCountAsync();
+        Task<IList<AccountDTO>> GetAccountsByDateAsync(DateTime date);
+        Task<int> GetAccountCountByDateAsync(DateTime date);
     }
 }

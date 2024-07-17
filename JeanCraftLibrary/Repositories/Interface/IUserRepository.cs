@@ -1,5 +1,6 @@
 ﻿using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using System.Linq.Expressions;
 
 namespace JeanCraftLibrary.Repositories.Interface
 {
@@ -12,5 +13,8 @@ namespace JeanCraftLibrary.Repositories.Interface
         Task<Account?> GetUserByEmail(string email);
         Task<Account?> ChangePassword(Account user, string newPassword);
         Task<Account?> UpdateUser(Account user);
+        Task<(IEnumerable<Account>, int)> GetAccountsAsync(string? search, int currentPage, int pageSize);
+        Task<int> GetTotalAccountsCountAsync();
+        Task<int> GetAccountCountByDateAsync(DateTime date);
     }
 }

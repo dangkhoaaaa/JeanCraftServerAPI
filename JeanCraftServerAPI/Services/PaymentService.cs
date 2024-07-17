@@ -6,6 +6,10 @@ using JeanCraftLibrary;
 using JeanCraftServerAPI.Services.Interface;
 using System.Linq.Expressions;
 using JeanCraftLibrary.Repositories;
+using System.Globalization;
+using JeanCraftServerAPI.Util;
+using Microsoft.EntityFrameworkCore;
+using JeanCraftLibrary.Model.Response;
 
 namespace JeanCraftServerAPI.Services
 {
@@ -24,6 +28,7 @@ namespace JeanCraftServerAPI.Services
         {
             try
             {
+                paymentModel.Id = Guid.NewGuid();
                 var Entity = _mapper.Map<Payment>(paymentModel);
 
                 var repos = _unitOfWork.PaymentRepository;
@@ -79,6 +84,28 @@ namespace JeanCraftServerAPI.Services
             }
         }
 
+        //public SuccessfulPaymentResult GetAllSuccessfulPaymentsWithPaging(int currentPage, int pageSize)
+        //{
+        //    try
+        //    {
+        //        Func<IQueryable<Payment>, IOrderedQueryable<Payment>> orderBy = null;
+        //        Expression<Func<Payment, bool>> filter = p => p.Status == "Thành công"; 
+
+        //        var payments = _unitOfWork.PaymentRepository.GetDetail(filter, orderBy, "", currentPage, pageSize).ToList();
+
+        //        double totalAmount = (double)payments.Sum(p => p.Amount);
+
+        //        return new SuccessfulPaymentResult
+        //        {
+        //            Payments = payments,
+        //            TotalAmount = totalAmount
+        //        };
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw e;
+        //    }
+        //}
 
         public async Task<IList<PaymentModel>> GetAll()
         {
@@ -86,19 +113,42 @@ namespace JeanCraftServerAPI.Services
             return _mapper.Map<IList<PaymentModel>>(payments);
         }
 
-        public PaymentModel GetDetailOne(Guid id, int currentPage, int pageSize)
+        public Payment GetDetailOne(Guid id, int currentPage, int pageSize)
         {
             Expression<Func<Payment, bool>> filter = order => order.Id == id;
             Func<IQueryable<Payment>, IOrderedQueryable<Payment>> orderBy = null;
-            var Entity = _unitOfWork.PaymentRepository.GetDetail(filter, orderBy, "Orders", currentPage, pageSize).FirstOrDefault();
-            return _mapper.Map<PaymentModel>(Entity);
+            var Entity = _unitOfWork.PaymentRepository.GetDetail(filter, orderBy, "", currentPage, pageSize).FirstOrDefault();
+            return Entity;
         }
-        public IList<PaymentModel> GetAllPaging(int currentPage, int pageSize)
+        public PaymentResult GetAllPaging(int currentPage, int pageSize)
         {
+            try
+            {
+                var query = _unitOfWork.PaymentRepository.GetDetail(null, null, "").OrderByDescending(x => revertDate(x.Status));
 
-            Func<IQueryable<Payment>, IOrderedQueryable<Payment>> orderBy = null;
-            var Entity = _unitOfWork.PaymentRepository.GetDetail(null, orderBy, "Orders", currentPage, pageSize);
-            return _mapper.Map<IList<PaymentModel>>(Entity);
+                var totalCount = query.Count();
+                var totalAmount = query.Sum(payment => payment.Amount);
+
+                // Lấy dữ liệu cho trang hiện tại
+                var payments = query.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+                // Tính tổng số trang
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                return new PaymentResult
+                {
+                    Payments = payments,
+                    TotalAmount = (double)totalAmount,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                    CurrentPage = currentPage,
+                    PageSize = pageSize
+                };
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
         public async Task<PaymentModel> GetOne(Guid paymentId)
         {
@@ -130,5 +180,67 @@ namespace JeanCraftServerAPI.Services
             }
         }
 
+        public double GetTotalAmountOfSuccessfulPayments() 
+        {
+            try
+            {
+                Expression<Func<Payment, bool>> filter = p => p.Status.Contains("Success");
+                var payments = _unitOfWork.PaymentRepository.GetDetail(filter).ToList();
+                return (double)payments.Sum(p => p.Amount);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public double GetTotalAmountOfPayments()
+        {
+            try
+            {
+                return (double)_unitOfWork.PaymentRepository.GetDetail(null, null, "").Sum(payment => payment.Amount);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public int GetTotalCount()
+        {
+            try
+            {
+                return _unitOfWork.PaymentRepository.GetDetail(null, null, "").Count();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+        private String revertDate(String date) 
+        {
+            var parts = date.Split(' ');
+            var datePart = parts[2];
+            var timePart = parts[1];
+            DateTime parsedDate = DateTime.ParseExact(datePart + " " + timePart, "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
+            string outputDateString = parsedDate.ToString("yyyy/MM/dd HH:mm", CultureInfo.InvariantCulture);
+            return outputDateString;
+        }
+
+        public async Task<AmountAndCountForDay> getAAmountAndCountForDay(String date)
+        {
+            AmountAndCountForDay x = new AmountAndCountForDay();
+            try
+            {
+                x.Amount = (double)_unitOfWork.PaymentRepository.GetDetail(null, null, "").Where(x => x.Status.Contains(date)).Sum(payment => payment.Amount);
+                x.Date = date;
+                x.Count = (int)_unitOfWork.PaymentRepository.GetDetail(null, null, "").Where(x => x.Status.Contains(date)).Count();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return x;
+        }
     }
 }

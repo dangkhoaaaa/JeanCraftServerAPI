@@ -28,9 +28,9 @@ namespace JeanCraftServerAPI.Services
             return await _unitOfWork.ComponentRepsitory.DeleteComponent(componentId);
         }
 
-        public async Task<List<IGrouping<Guid?, Component>>> GetAllComponent()
+        public async Task<List<IGrouping<Guid?, Component>>> GetAllComponent(string? search, int currentPage, int pageSize)
         {
-            return await _unitOfWork.ComponentRepsitory.GetAllComponent();
+            return await _unitOfWork.ComponentRepsitory.GetAllComponent(search, currentPage, pageSize);
         }
 
         public async Task<Component> GetComponentById(Guid componentId)

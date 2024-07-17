@@ -32,7 +32,7 @@ namespace JeanCraftServerAPI.Controllers
 
         // PUT: api/Profile/update
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateProfile([FromBody] AccountDTO accountDto)
+        public async Task<IActionResult> UpdateProfile([FromBody] AccountDTOs? accountDto)
         {
             if (!ModelState.IsValid)
             {
@@ -44,9 +44,12 @@ namespace JeanCraftServerAPI.Controllers
                 UserId = accountDto.UserId,
                 UserName = accountDto.UserName,
                 PhoneNumber = accountDto.Phonenumber,
-                Email = accountDto.Email,
-                Image = accountDto.Image,
-                Addresses = accountDto.Addresses
+                Addresses = accountDto.Addresses.Select(a => new Address
+                {
+                    Id = a.Id,
+                    UserId = a.UserId,
+                    Detail = a.Detail
+                }).ToList()
             };
 
             var updatedAccount = await _userService.UpdateUserProfile(account);

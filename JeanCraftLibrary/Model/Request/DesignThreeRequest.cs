@@ -11,7 +11,5 @@ namespace JeanCraftLibrary.Model.Request
         public Guid? StitchingThreadColor { get; set; }
 
         public Guid? ButtonAndRivet { get; set; }
-
-        public Guid? BranchBackPatch { get; set; }
     }
 }

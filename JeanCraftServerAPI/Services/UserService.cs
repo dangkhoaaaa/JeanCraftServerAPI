@@ -8,6 +8,7 @@ using JeanCraftLibrary;
 using Microsoft.AspNetCore.Identity.Data;
 using static System.Net.WebRequestMethods;
 using JeanCraftLibrary.Repositories;
+using System.Linq.Expressions;
 
 namespace JeanCraftServerAPI.Services
 {
@@ -44,6 +45,7 @@ namespace JeanCraftServerAPI.Services
                 Email = userDto.Email,
                 Password = HashPassword("123456"),
                 Status = true,
+                InsDate = DateTime.Now,
                 RoleId = Guid.Parse(Constants.ROLE_USER),
             };
             return await _unitOfWork.UserRepository.CreateUserGoogle(user);
@@ -75,6 +77,7 @@ namespace JeanCraftServerAPI.Services
                 PhoneNumber = user.PhoneNumber,
                 Password = HashPassword(user.Password),
                 Image = user.Image,
+                InsDate = DateTime.Now,
                 Status = user.Status,
             };
             return await _unitOfWork.UserRepository.RegisterUser(fileName, account);
@@ -168,7 +171,36 @@ namespace JeanCraftServerAPI.Services
                 Message = "Password has been reset successfully."
             };
         }
-            
+        public async Task<(IEnumerable<Account>, int)> GetAccountsAsync(string? search, int currentPage, int pageSize)
+        {
+            return await _unitOfWork.UserRepository.GetAccountsAsync(search, currentPage, pageSize);
+        }
+
+        public async Task<int> GetTotalAccountsCountAsync()
+        {
+            return await _unitOfWork.UserRepository.GetTotalAccountsCountAsync();
+        }
+
+        public async Task<IList<AccountDTO>> GetAccountsByDateAsync(DateTime date)
+        {
+            var startDate = date.Date;
+            var endDate = startDate.AddDays(1);
+
+            var accounts = await _unitOfWork.UserRepository.GetAllAsync(o => o.InsDate >= startDate && o.InsDate < endDate);
+            return accounts.Select(a => new AccountDTO
+            {
+                UserId = a.UserId,
+                UserName = a.UserName,
+                Email = a.Email,
+                Phonenumber = a.PhoneNumber,
+                InsDate = a.InsDate,
+            }).ToList();
+        }
+
+        public async Task<int> GetAccountCountByDateAsync(DateTime date)
+        {
+            return await _unitOfWork.UserRepository.GetAccountCountByDateAsync(date);
+        }
     }
 }
 

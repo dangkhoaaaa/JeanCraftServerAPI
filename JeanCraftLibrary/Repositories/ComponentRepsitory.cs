@@ -48,11 +48,19 @@ namespace JeanCraftLibrary.Repositories
             return true;
         }
 
-        public async Task<List<IGrouping<Guid?, Component>>> GetAllComponent()
+        public async Task<List<IGrouping<Guid?, Component>>> GetAllComponent(string? search, int currentPage, int pageSize)
         {
-            var components = await _dbContext.Components.Include(x => x.TypeNavigation).GroupBy(y => y.Type).ToListAsync();
+            var query = _dbContext.Components.Include(x => x.TypeNavigation).AsQueryable();
 
-            return components;
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(a => a.Description.Contains(search));
+            }
+
+            var paginatedComponents = await query.Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+            var groupedComponents = paginatedComponents.GroupBy(y => y.Type).ToList();
+
+            return groupedComponents;
         }
 
         public async Task<Component> GetComponentById(Guid Id)

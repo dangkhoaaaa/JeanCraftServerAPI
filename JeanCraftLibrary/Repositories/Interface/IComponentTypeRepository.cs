@@ -9,7 +9,7 @@ namespace JeanCraftLibrary.Repositories.Interface
 {
     public interface IComponentTypeRepository : IGenericRepository<ComponentType>
     {
-        Task<IEnumerable<ComponentType>> GetAllComponent();
+        Task<IEnumerable<ComponentType>> GetAllComponent(string? search, int currentPage, int pageSize);
 
         Task<IEnumerable<ComponentType>> GetComponentById(Guid ComponentTypeId);
         Task<ComponentType> CreateComponent(ComponentType ComponentType);

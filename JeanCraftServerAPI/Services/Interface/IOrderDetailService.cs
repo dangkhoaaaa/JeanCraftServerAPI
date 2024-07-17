@@ -17,5 +17,6 @@ namespace JeanCraftServerAPI.Services.Interface
         OrderDetailFormModel GetDetailOne(Guid id, int currentPage, int pageSize);
 
         IList<OrderDetailFormModel> GetAllPaging(int currentPage, int pageSize);
+        Task<List<OrderDetail>> GetOrderDetailByOrderID(Guid orderID);
     }
 }

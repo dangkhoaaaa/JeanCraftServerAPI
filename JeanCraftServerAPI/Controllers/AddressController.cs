@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
+using JeanCraftLibrary.Model.Request;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -42,27 +43,19 @@ namespace JeanCraftServerAPI.Controllers
         //}
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateAddress([FromBody] Address addressdto)
+        public async Task<IActionResult> CreateAddress([FromBody] AddressRequest addressRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (addressdto.UserId == null || addressdto.UserId == Guid.Empty)
+            if (addressRequest.UserId == null || addressRequest.UserId == Guid.Empty)
             {
                 return BadRequest("UserId is required and cannot be empty.");
             }
 
-            var newAddress = new Address
-            {
-                Id = Guid.NewGuid(),
-                UserId = addressdto.UserId,
-                Type = addressdto.Type,
-                Detail = addressdto.Detail
-            };
-
-            var createdAddress = await _addressService.CreateAddress(newAddress);
+            var createdAddress = await _addressService.CreateAddress(addressRequest);
 
             if (createdAddress == null)
             {

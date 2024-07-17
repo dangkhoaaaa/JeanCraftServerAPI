@@ -9,6 +9,7 @@ namespace JeanCraftLibrary.Repositories.Interface
 {
     public interface IOrderRepository : IGenericRepository<Order>
     {
-       
+        Task<List<OrderDetail>> GetOrderDetailByOrderID(Guid orderID);
+        Task<int> GetOrderCountByDateAsync(DateTime date);
     }
 }

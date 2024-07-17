@@ -41,5 +41,14 @@
         static public string USERNAME = "namppse160820@fpt.edu.vn";
         static public string PASSWORD = "imqk gqyk vifk myfs";
 
+        /*MoMo*/
+        static public string ACCESSKEY = "F8BBA842ECF85";
+        static public string SECRETKEY = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+        static public string REDIRECTURL = "https://www.facebook.com/craftingdenim";
+        static public string IPNMOMO = "https://jeancraft-be.onrender.com/api/Payment/ipn";
+
+        /*ZaloPay*/
+        static public string appId = "2553";
+        static public string key = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL";
     }
 }

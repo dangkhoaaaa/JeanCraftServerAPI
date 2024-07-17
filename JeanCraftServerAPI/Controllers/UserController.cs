@@ -15,6 +15,8 @@ using System.Security.Claims;
 using System.Text;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Identity.Data;
+using JeanCraftServerAPI.Services;
+using System.Globalization;
 
 namespace JeanCraftServerAPI.Controllers
 {
@@ -191,11 +193,78 @@ namespace JeanCraftServerAPI.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-
         private bool VerifyPassword(string hashedPassword, string password)
         {
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 
+        [HttpGet("get-all-accounts")]
+        public async Task<IActionResult> GetAllAccounts(string? search, int currentPage, int pageSize)
+        {
+            var (accounts, totalCount) = await _userService.GetAccountsAsync(search, currentPage, pageSize);
+            var response = accounts.Select(a => new AccountDTO
+            {
+                UserId = a.UserId,
+                UserName = a.UserName,
+                Phonenumber = a.PhoneNumber,
+                Email = a.Email,
+                Image = a.Image,
+                InsDate = a.InsDate,
+                Addresses = a.Addresses.Select(addr => new AddressDTO
+                {
+                    Id = addr.Id,
+                    UserId = addr.UserId,
+                    Detail = addr.Detail
+                }).ToList()
+            });
+
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            return Ok(new
+            {
+                Accounts = response,
+                TotalPages = totalPages
+            });
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> GetTotalAccountsCount()
+        {
+            var totalCount = await _userService.GetTotalAccountsCountAsync();
+            return Ok(new { TotalCount = totalCount });
+        }
+
+        [HttpGet("GetAccountsByDate")]
+        public async Task<ActionResult<IEnumerable<AccountDTO>>> GetAccountsByDate([FromQuery] string date)
+        {
+            if (DateTime.TryParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            {
+                var accounts = await _userService.GetAccountsByDateAsync(parsedDate);
+                if (accounts == null || accounts.Count == 0)
+                {
+                    return NotFound("No accounts found for the specified date.");
+                }
+                return Ok(accounts);
+            }
+            else
+            {
+                return BadRequest("Invalid date format. Please use 'dd-MM-yyyy'.");
+            }
+        }
+
+        [HttpGet("GetAccountCountByDate")]
+        public async Task<IActionResult> GetAccountCountByDate([FromQuery] string date)
+        {
+            if (DateTime.TryParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            {
+                var accountCount = await _userService.GetAccountCountByDateAsync(parsedDate);
+
+                return Ok(new { Date = parsedDate.ToString("dd-MM-yyyy"), AccountCount = accountCount });
+            }
+            else
+            {
+                return BadRequest("Invalid date format. Please use 'dd-MM-yyyy'.");
+            }
+        }
     }
 }

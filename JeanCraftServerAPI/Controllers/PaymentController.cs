@@ -1,14 +1,23 @@
-﻿using JeanCraftLibrary.Entity;
-using JeanCraftLibrary.Model;
+﻿using JeanCraftLibrary.Model;
 using JeanCraftLibrary.Model.Request;
 using JeanCraftServerAPI.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text;
-using System.Threading.Tasks;
+using JeanCraftLibrary.Entity;
+using ZaloPay.Helper;
+using ZaloPay.Helper.Crypto;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
+using static System.Net.WebRequestMethods;
+using System.Net.Http;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using JeanCraftServerAPI.Services;
+using Microsoft.AspNetCore.Authorization;
+using Net.payOS;
+using Net.payOS.Types;
+using JeanCraftLibrary.Model.Response;
 
 namespace JeanCraftServerAPI.Controllers
 {
@@ -17,42 +26,102 @@ namespace JeanCraftServerAPI.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
-
-        public PaymentController(IPaymentService paymentService)
+        private readonly IVnPayService _vnPayservice;
+        private readonly IConfiguration _config;
+        public PaymentController(IPaymentService paymentService, IVnPayService vnPayservice, IConfiguration config)
         {
             _paymentService = paymentService;
+            _vnPayservice = vnPayservice;
+            _config = config;
         }
 
 
         private static readonly HttpClient client = new HttpClient();
-        private const string AccessKey = "F8BBA842ECF85";
-        private const string SecretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
-
-        [HttpPost("pay")]
-        public async Task<IActionResult> Pay([FromBody] PaymentModel requestModel)
+        [HttpPost("payWithPayOS")]
+        public async Task<IActionResult> PayWithPayOS([FromBody] PaymentModel requestModel)
         {
+            Random r = new Random();
+            PayOS payOS = new PayOS(_config["PayOS:clientId"], _config["PayOS:apiKey"], _config["PayOS:checksumKey"]);
+            PaymentData paymentData = new PaymentData(r.NextInt64(1000000), ((int)requestModel.Amount), "Thanh toan JeanCraft", null, requestModel.RedirectUrl, requestModel.RedirectUrl);
+
+            CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
+            return Ok(createPayment);
+        }
+
+        [HttpPost("payWithVnPay")]
+        public async Task<IActionResult> PayWithVnPay([FromBody] PaymentModel requestModel)
+        {
+            var vnPayModel = new VnPaymentRequestModel
+            {
+                Amount = requestModel.Amount,
+                CreatedDate = DateTime.Now,
+                Description = $"JeanCraft-" + requestModel.OrderId.ToString,
+                FullName = "model.HoTen",
+                OrderId = requestModel.OrderId.ToString(),
+                RedirectUrl = requestModel.RedirectUrl
+            };
+            return Ok(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
+        }
+
+        [HttpPost("payWithZaloPay")]
+        public async Task<IActionResult> PayWithZaloPay([FromBody] PaymentModel requestModel)
+        {
+            string app_id = "2553";
+            string key1 = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL";
+            string create_order_url = "https://sb-openapi.zalopay.vn/v2/create";
+            Random r = new Random();
+            var embed_data = new { redirecturl = requestModel.RedirectUrl,
+            orderId = requestModel.OrderId};
+            var items = new[] { new { } };
+            var param = new Dictionary<string, string>();
+            var app_trans_id = r.Next(1000000);
+
+            param.Add("app_id", app_id);
+            param.Add("app_user", "JeanCraft");
+            param.Add("app_time", Utils.GetTimeStamp().ToString());
+            param.Add("amount", requestModel.Amount.ToString());
+            param.Add("app_trans_id", DateTime.Now.ToString("yyMMdd") + "_" + app_trans_id); // mã giao dich có định dạng yyMMdd_xxxx
+            param.Add("embed_data", JsonConvert.SerializeObject(embed_data));
+            param.Add("item", JsonConvert.SerializeObject(items));
+            param.Add("description", "JeanCraft - Thanh toán đơn hàng #" + app_trans_id);
+            param.Add("bank_code", "zalopayapp");
+
+            var data = app_id + "|" + param["app_trans_id"] + "|" + param["app_user"] + "|" + param["amount"] + "|"
+                + param["app_time"] + "|" + param["embed_data"] + "|" + param["item"];
+            param.Add("mac", HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, key1, data));
+            var quickPayResponse = await HttpHelper.PostFormAsync(create_order_url, param);
+            
+            return Ok(quickPayResponse);
+        }
+
+
+
+        [HttpPost("payWithMomo")]
+        public async Task<IActionResult> PayWithMomo([FromBody] PaymentModel requestModel)
+        {
+
             var request = new CollectionLinkRequest
             {
                 orderInfo = "pay with MoMo",
                 partnerCode = "MOMO",
-                redirectUrl = "https://www.linkedin.com/in/danggkhoaaaa/",
-                ipnUrl = "https://localhost:7123/api/Payment/ipn",
+                redirectUrl = requestModel.RedirectUrl,
+                ipnUrl = Constants.IPNMOMO,
                 amount = (long)requestModel.Amount,
-                orderId = requestModel.OrderId.ToString(),
+                orderId = requestModel.OrderId.ToString() + ":" + Guid.NewGuid(),
                 requestId = Guid.NewGuid().ToString(),
                 requestType = "payWithMethod",
                 extraData = "",
-                partnerName = "ToTe Payment",
-                storeId = "test",
+                partnerName = "JeanCraft Payment",
+                storeId = "JeanCraft",
                 orderGroupId = "",
                 autoCapture = true,
                 lang = "vi"
             };
 
-            var rawSignature = $"accessKey={AccessKey}&amount={request.amount}&extraData={request.extraData}&ipnUrl={request.ipnUrl}&orderId={request.orderId}&orderInfo={request.orderInfo}&partnerCode={request.partnerCode}&redirectUrl={request.redirectUrl}&requestId={request.requestId}&requestType={request.requestType}";
-            request.signature = GetSignature(rawSignature, SecretKey);
+            var rawSignature = $"accessKey={Constants.ACCESSKEY}&amount={request.amount}&extraData={request.extraData}&ipnUrl={request.ipnUrl}&orderId={request.orderId}&orderInfo={request.orderInfo}&partnerCode={request.partnerCode}&redirectUrl={request.redirectUrl}&requestId={request.requestId}&requestType={request.requestType}";
+            request.signature = GetSignature(rawSignature, Constants.SECRETKEY);
 
-            var httpContent = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+            var httpContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
             var quickPayResponse = await client.PostAsync("https://test-payment.momo.vn/v2/gateway/api/create", httpContent);
 
             if (!quickPayResponse.IsSuccessStatusCode)
@@ -69,7 +138,7 @@ namespace JeanCraftServerAPI.Controllers
         public IActionResult ReceiveMoMoIPN([FromBody] MoMoIPNRequest request)
         {
             var rawData = $"partnerCode={request.PartnerCode}&orderId={request.OrderId}&requestId={request.RequestId}&amount={request.Amount}&orderInfo={request.OrderInfo}&orderType={request.OrderType}&transId={request.TransId}&resultCode={request.ResultCode}&message={request.Message}&payType={request.PayType}&responseTime={request.ResponseTime}&extraData={request.ExtraData}";
-            var signature = GetSignature(rawData, SecretKey);
+            var signature = GetSignature(rawData, Constants.SECRETKEY);
 
             if (signature != request.Signature)
             {
@@ -92,14 +161,72 @@ namespace JeanCraftServerAPI.Controllers
 
 
         [HttpGet("GetAllPayments")]
-        public async Task<ActionResult<IEnumerable<PaymentModel>>> GetAllPayments([FromQuery] FormSearch search)
+        public async Task<ActionResult<PaymentResult>> GetAllPayments([FromQuery] FormSearch search)
         {
-            var payments = _paymentService.GetAllPaging(search.currentPage, search.pageSize);
-            if (payments == null || payments.Count == 0)
+            var paymentResult = _paymentService.GetAllPaging(search.currentPage, search.pageSize);
+
+            if (paymentResult == null || paymentResult.Payments == null || paymentResult.Payments.Count == 0)
             {
                 return NotFound("No payments found.");
             }
-            return Ok(payments);
+
+            return Ok(paymentResult);
+        }
+
+        [HttpGet("GetTotalAmount")]
+        public async Task<ActionResult<double>> GetTotalAmount()
+        {
+            var totalAmount = _paymentService.GetTotalAmountOfPayments();
+
+            return Ok(totalAmount);
+        }
+
+        [HttpGet("GetTotalCount")]
+        public async Task<ActionResult<int>> GetTotalCount()
+        {
+            var totalCount = _paymentService.GetTotalCount();
+            return Ok(totalCount);
+        }
+
+        //[HttpGet("GetAllSuccessfulPayments")]
+        //public async Task<ActionResult<Payment>> GetAllSuccessfulPaymentsWithPaging(int currentPage, int pageSize)
+        //{
+        //    try
+        //    {
+        //        var result = _paymentService.GetAllSuccessfulPaymentsWithPaging(currentPage, pageSize);
+
+        //        var successfulPaymentResult = new SuccessfulPaymentResult
+        //        {
+        //            Payments = result.Payments.Select(p => new Payment
+        //            {
+        //                Id = p.Id,
+        //                OrderId = p.OrderId,
+        //                Status = p.Status,
+        //                Amount = p.Amount,
+        //                Method = p.Method,
+        //            }).ToList(),
+        //            TotalAmount = result.TotalAmount
+        //        };
+        //        return Ok(successfulPaymentResult);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+        //    }
+        //}
+
+        [HttpGet("GetTotalAmountOfSuccessfulPayments")] 
+        public async Task<ActionResult<double>> GetTotalAmountOfSuccessfulPayments()
+        {
+            try
+            {
+                var totalAmount = _paymentService.GetTotalAmountOfSuccessfulPayments();
+                return Ok(totalAmount);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("GetPaymentById/{id}")]
@@ -182,5 +309,40 @@ namespace JeanCraftServerAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [Authorize]
+        [HttpPost("PaymentCallBack")]
+        public IActionResult PaymentCallBack()
+        {
+            var response = _vnPayservice.PaymentExecute(Request.Query);
+
+            if (response == null || response.VnPayResponseCode != "00")
+            {
+                return Ok(response);
+            }
+
+
+            // Lưu đơn hàng vô database
+
+            return Ok(response);
+        }
+        [HttpPost("GetAAmountAndCountForDay")]
+        public async Task<ActionResult<AmountAndCountForDay>> getAAmountAndCountForDay([FromQuery] string day, [FromQuery] string month, [FromQuery] string year)
+        {
+            if (day.Length > 2 || month.Length > 2 || year.Length > 4 || day.Length == 0 || month.Length == 0 || year.Length == 0)
+            {
+                return BadRequest("Invalid date");
+            }
+            if(day.Length == 1) day = 0 + day;
+            if (month.Length == 1) month = 0 + month;
+            string date = day + "/" + month + "/" + year;
+            date = String.Format(date, "dd/mm/yyyy");
+            var payment = _paymentService.getAAmountAndCountForDay(String.Format(date, "dd/mm/yyyy"));
+            if (payment == null)
+            {
+                return NotFound($"Payment in date {day + "/" + month + "/" + year} not found.");
+            }
+            return Ok(payment.Result);
+        }
     }
+
 }

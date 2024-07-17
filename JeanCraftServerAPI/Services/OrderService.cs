@@ -4,6 +4,7 @@ using JeanCraftLibrary.Entity;
 using JeanCraftLibrary.Model;
 using JeanCraftLibrary.Model.Request;
 using JeanCraftServerAPI.Services.Interface;
+using JeanCraftServerAPI.Util;
 using System.Linq.Expressions;
 
 namespace JeanCraftServerAPI.Services
@@ -20,7 +21,7 @@ namespace JeanCraftServerAPI.Services
             _mapper = mapper;
         }
 
-        public async Task Add(OrderCreateRequestModel orderFormModel)
+        public async Task<Guid> Add(OrderCreateRequestModel orderFormModel)
         {
             try
             {
@@ -41,9 +42,10 @@ namespace JeanCraftServerAPI.Services
                 } while (true);
 
                 orderEntity.Id = newGuid;
-
+                orderEntity.CreateDate = DateTime.Now.AddHours(7);
                 await repos.AddAsync(orderEntity);
                 await _unitOfWork.CommitAsync();
+                return orderEntity.Id;
             }
             catch (Exception)
             {
@@ -102,11 +104,47 @@ namespace JeanCraftServerAPI.Services
             var orderEntity = _unitOfWork.OrderRepository.GetDetail(filter, orderBy, "OrderDetails", currentPage, pageSize).FirstOrDefault();
             return _mapper.Map<OrderFormModel>(orderEntity);
         }
-        public IList<OrderFormModel> GetAllPaging(int currentPage, int pageSize)
+
+        public PageResult<OrderFormModel> GetAllPaging(int currentPage, int pageSize)
         {
-          
-            Func<IQueryable<Order>, IOrderedQueryable<Order>> orderBy = null;
-            var orderEntity = _unitOfWork.OrderRepository.GetDetail(null, orderBy, "OrderDetails", currentPage, pageSize);
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> orderBy = orders => orders.OrderByDescending(order => order.CreateDate);
+            var query = _unitOfWork.OrderRepository.GetDetail(null, orderBy, "OrderDetails");
+
+            var totalRecords = query.Count();
+
+            var orderEntities = query.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+            var orderModels = _mapper.Map<IList<OrderFormModel>>(orderEntities);
+
+            return new PageResult<OrderFormModel>
+            {
+                Items = orderModels,
+                TotalRecords = totalRecords,
+                TotalPages = totalPages,
+                CurrentPage = currentPage,
+                PageSize = pageSize
+            };
+        }
+
+        public int GetTotalCount()
+        {
+            try
+            {
+                return _unitOfWork.OrderRepository.GetDetail(null, null, "").Count();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public IList<OrderFormModel> GetAllPagingSucessfully(int currentPage, int pageSize)
+        {
+
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> orderBy = orders => orders.OrderByDescending(order => order.CreateDate);
+            var orderEntity = _unitOfWork.OrderRepository.GetDetail(null, orderBy, "OrderDetails", currentPage, pageSize).Where(x => (x.Status == null ? false : x.Status.Equals("Đã hoàn tất")));
             return _mapper.Map<IList<OrderFormModel>>(orderEntity);
         }
         public async Task<OrderFormModel> GetOne(Guid orderId)
@@ -143,5 +181,42 @@ namespace JeanCraftServerAPI.Services
             }
         }
 
+        public async Task UpdateStatus(Guid id, string status)
+        {
+            try
+            {
+                var repos = _unitOfWork.OrderRepository;
+                var existingOrder = await repos.FindAsync(id);
+                if (existingOrder == null)
+                    throw new KeyNotFoundException();
+                existingOrder.Status = status;
+
+                await _unitOfWork.CommitAsync();
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
+        }
+
+        public async Task<List<OrderDetail>> GetOrderDetailByOrderID(Guid orderID)
+        {
+            return await _unitOfWork.OrderRepository.GetOrderDetailByOrderID(orderID);
+        }
+
+        public async Task<IList<OrderFormModel>> GetOrdersByDateAsync(DateTime date)
+        {
+            var startDate = date.Date;
+            var endDate = startDate.AddDays(1);
+
+            var orders = await _unitOfWork.OrderRepository.GetAllAsync(o => o.CreateDate >= startDate && o.CreateDate < endDate);
+            return _mapper.Map<IList<OrderFormModel>>(orders);
+        }
+
+        public async Task<int> GetOrderCountByDateAsync(DateTime date)
+        {
+            return await _unitOfWork.OrderRepository.GetOrderCountByDateAsync(date);
+        }
     }
 }
